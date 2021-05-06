@@ -1,0 +1,6 @@
+name = "worker-example"
+type = "webpack"
+workers_dev = true
+webpack_config = "webpack.config.js"
+kv_namespaces = [ "KV_NAMESPACE_NAME" ]
+environment_variables= [ "API_KEY" ]
