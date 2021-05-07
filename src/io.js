@@ -81,14 +81,14 @@ const confirmSecretAdding = async () => {
 	})
 }
 
-const inputVariables = async (variables) => {
+const inputSecrets = async (secrets) => {
 	return new Promise((resolve) => {
 		inquirer
-			.prompt(variables.map((variable) => {
+			.prompt(secrets.map((secret) => {
 				return {
 					type: 'input',
-					name: variable,
-					message: `Enter a value for "${ variable }":`
+					name: secret,
+					message: `Enter a value for "${ secret }":`
 				}
 			}))
 			.then((answers) => {
@@ -161,7 +161,7 @@ module.exports = {
 	confirmNamespaceCreation,
 	confirmPublish,
 	confirmSecretAdding,
-	inputVariables,
+	inputSecrets,
 	selectDomainType,
 	inputZoneId,
 	inputRoutes

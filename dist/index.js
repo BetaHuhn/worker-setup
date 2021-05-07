@@ -44251,68 +44251,68 @@ class Runner {
 
 			this.log.text(`---------------------------------------------------------------------------------`)
 
-			if (workerConfig.environment_variables) {
-				this.log.info(`The Worker you are trying to deploy requires one or more Environment Variables/Secrets`)
+			if (workerConfig.secrets) {
+				this.log.info(`The Worker you are trying to deploy requires one or more secrets`)
 
 				this.log.load(`Checking if required secrets are set`)
 
-				const existingVariables = await wrangler.getSecrets(accountId)
-				this.log.debug(existingVariables)
+				const existingSecrets = await wrangler.getSecrets(accountId)
+				this.log.debug(existingSecrets)
 
-				const finalVariables = []
-				const missingVariables = []
+				const finalSecrets = []
+				const missingSecrets = []
 
-				workerConfig.environment_variables.forEach((variable) => {
-					const exists = existingVariables.find((item) => item.name === variable)
+				workerConfig.secrets.forEach((secretKey) => {
+					const exists = existingSecrets.find((item) => item.name === secretKey)
 
 					if (exists) {
-						finalVariables.push(variable)
+						finalSecrets.push(secretKey)
 
 						return
 					}
 
-					missingVariables.push(variable)
+					missingSecrets.push(secretKey)
 				})
 
-				this.log.debug(missingVariables)
+				this.log.debug(missingSecrets)
 
-				if (missingVariables.length > 0) {
+				if (missingSecrets.length > 0) {
 
-					this.log.info(`The following Environment Variables/Secrets are needed:`)
+					this.log.info(`The following secrets are needed:`)
 					this.log.text('')
 
-					finalVariables.forEach((variable) => {
-						console.log(`- ${ variable } (already exists)`)
+					finalSecrets.forEach((secretKey) => {
+						console.log(`- ${ secretKey } (already exists)`)
 					})
 
-					missingVariables.forEach((variable) => {
-						console.log(`- ${ variable } (needs to be created)`)
+					missingSecrets.forEach((secretKey) => {
+						console.log(`- ${ secretKey } (needs to be created)`)
 					})
 
 					this.log.text('')
 
-					const askForVariables = await io.confirmSecretAdding()
-					if (!askForVariables) {
-						this.log.warn(`Please create the following Environment Variables/Secrets yourself before continuing: ${ missingVariables.join(', ') }`)
+					const askForSecrets = await io.confirmSecretAdding()
+					if (!askForSecrets) {
+						this.log.warn(`Please create the following secrets yourself before continuing: ${ missingSecrets.join(', ') }`)
 						process.exit(0)
 					}
 
-					const values = await io.inputVariables(missingVariables)
-					this.log.debug(values)
+					const secrets = await io.inputSecrets(missingSecrets)
+					this.log.debug(secrets)
 
-					this.log.load(`Saving your Variables/Secrets...`)
+					this.log.load(`Saving your secrets...`)
 
-					await forEach(Object.entries(values), async ([ key, val ]) => {
+					await forEach(Object.entries(secrets), async ([ key, val ]) => {
 						this.log.changeText(`Uploading "${ key }"...`)
 
 						await wrangler.saveSecret(accountId, key, val)
 
-						finalVariables.push(key)
+						finalSecrets.push(key)
 					})
 
-					this.log.succeed(`All required Variables/Secrets created`)
+					this.log.succeed(`All required secrets created`)
 				} else {
-					this.log.succeed(`All required Variables/Secrets already exist`)
+					this.log.succeed(`All required secrets already exist`)
 				}
 			}
 
@@ -44831,14 +44831,14 @@ const confirmSecretAdding = async () => {
 	})
 }
 
-const inputVariables = async (variables) => {
+const inputSecrets = async (secrets) => {
 	return new Promise((resolve) => {
 		inquirer
-			.prompt(variables.map((variable) => {
+			.prompt(secrets.map((secret) => {
 				return {
 					type: 'input',
-					name: variable,
-					message: `Enter a value for "${ variable }":`
+					name: secret,
+					message: `Enter a value for "${ secret }":`
 				}
 			}))
 			.then((answers) => {
@@ -44911,7 +44911,7 @@ module.exports = {
 	confirmNamespaceCreation,
 	confirmPublish,
 	confirmSecretAdding,
-	inputVariables,
+	inputSecrets,
 	selectDomainType,
 	inputZoneId,
 	inputRoutes
