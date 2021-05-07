@@ -1,3 +1,12 @@
+## [v1.4.0] - 2021-05-07
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.0) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.3.0...v1.4.0) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.0) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.0.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.0.tar.gz))
+
+### New features
+
+- [`519b2a1`](https://github.com/BetaHuhn/worker-setup/commit/519b2a1)  Install wrangler binary automatically
+- [`ff0ec5d`](https://github.com/BetaHuhn/worker-setup/commit/ff0ec5d)  Login to CloudFlare via browser or api token if Wrangler not already authenticated
+
 ## [v1.3.0] - 2021-05-07
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.3.0) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.2.0...v1.3.0) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.3.0) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.3.0.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.3.0.tar.gz))
