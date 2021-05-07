@@ -3,11 +3,12 @@ const { performance } = require('perf_hooks')
 const {
 	forEach,
 	logger,
-	getEnvVariables,
 	parseTemplate,
-	writeConfig
+	writeConfig,
+	getValue
 } = require('./helpers')
 
+const { wranglerOptions } = require('./Constants')
 const wrangler = require('./Wrangler')
 const io = require('./io')
 
@@ -24,18 +25,47 @@ class Runner {
 
 			this.log.debug(templateConfig)
 
-			const envVariables = getEnvVariables()
+			wranglerOptions.forEach((option) => {
+				const val = getValue(option.key, option.type)
 
-			this.log.debug(envVariables)
-
-			Object.entries(envVariables).forEach(([ key, val ]) => {
-				if (key === 'kv_namespace_bindings') {
-					templateConfig['kv_namespace'] = val
-					return
-				}
-
-				templateConfig[key] = val
+				if (val !== undefined) templateConfig[option.key] = val
 			})
+
+			const namespaces = templateConfig.kv_namespaces
+			delete templateConfig.kv_namespaces
+
+			const finalNamespaces = []
+			if (namespaces) {
+				namespaces.forEach((namespace) => {
+					const id = getValue(`kv_namespace_${ namespace }`)
+					const preview = getValue(`kv_namespace_preview_${ namespace }`)
+
+					finalNamespaces.push({
+						binding: namespace,
+						id: id || '',
+						preview_id: preview || ''
+					})
+				})
+
+				templateConfig.kv_namespaces = finalNamespaces
+			}
+
+			const variables = templateConfig.environment_variables
+			delete templateConfig.environment_variables
+
+			const finalVariables = {}
+			if (variables) {
+				variables.forEach((variable) => {
+					const val = getValue(`var_${ variable }`)
+
+					finalVariables[variable] = val || ''
+				})
+
+				templateConfig.vars = finalVariables
+			}
+
+			delete templateConfig.recommended_route
+			delete templateConfig.secrets
 
 			this.log.debug(templateConfig)
 

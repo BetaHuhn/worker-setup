@@ -44046,10 +44046,6 @@ const wranglerOptions = [
 		type: 'string'
 	},
 	{
-		key: 'type',
-		type: 'string'
-	},
-	{
 		key: 'zone_id',
 		type: 'string'
 	},
@@ -44062,32 +44058,12 @@ const wranglerOptions = [
 		type: 'string'
 	},
 	{
-		key: 'webpack_config',
-		type: 'string'
-	},
-	{
-		key: 'dev',
-		type: 'string'
-	},
-	{
-		key: 'usage_model',
-		type: 'string'
-	},
-	{
 		key: 'workers_dev',
 		type: 'boolean'
 	},
 	{
 		key: 'routes',
 		type: 'array'
-	},
-	{
-		key: 'environment_variables',
-		type: 'array'
-	},
-	{
-		key: 'kv_namespace_bindings',
-		type: 'kvArray'
 	}
 ]
 
@@ -44105,11 +44081,12 @@ const { performance } = __nccwpck_require__(70630)
 const {
 	forEach,
 	logger,
-	getEnvVariables,
 	parseTemplate,
-	writeConfig
+	writeConfig,
+	getValue
 } = __nccwpck_require__(79403)
 
+const { wranglerOptions } = __nccwpck_require__(89493)
 const wrangler = __nccwpck_require__(17163)
 const io = __nccwpck_require__(28693)
 
@@ -44126,18 +44103,47 @@ class Runner {
 
 			this.log.debug(templateConfig)
 
-			const envVariables = getEnvVariables()
+			wranglerOptions.forEach((option) => {
+				const val = getValue(option.key, option.type)
 
-			this.log.debug(envVariables)
-
-			Object.entries(envVariables).forEach(([ key, val ]) => {
-				if (key === 'kv_namespace_bindings') {
-					templateConfig['kv_namespace'] = val
-					return
-				}
-
-				templateConfig[key] = val
+				if (val !== undefined) templateConfig[option.key] = val
 			})
+
+			const namespaces = templateConfig.kv_namespaces
+			delete templateConfig.kv_namespaces
+
+			const finalNamespaces = []
+			if (namespaces) {
+				namespaces.forEach((namespace) => {
+					const id = getValue(`kv_namespace_${ namespace }`)
+					const preview = getValue(`kv_namespace_preview_${ namespace }`)
+
+					finalNamespaces.push({
+						binding: namespace,
+						id: id || '',
+						preview_id: preview || ''
+					})
+				})
+
+				templateConfig.kv_namespaces = finalNamespaces
+			}
+
+			const variables = templateConfig.environment_variables
+			delete templateConfig.environment_variables
+
+			const finalVariables = {}
+			if (variables) {
+				variables.forEach((variable) => {
+					const val = getValue(`var_${ variable }`)
+
+					finalVariables[variable] = val || ''
+				})
+
+				templateConfig.vars = finalVariables
+			}
+
+			delete templateConfig.recommended_route
+			delete templateConfig.secrets
 
 			this.log.debug(templateConfig)
 
@@ -44556,8 +44562,6 @@ module.exports = {
 
 __nccwpck_require__(12437).config()
 
-const { wranglerOptions } = __nccwpck_require__(89493)
-
 const parseBoolean = (val) => {
 	const trueValue = [ 'true', 'True', 'TRUE' ]
 	const falseValue = [ 'false', 'False', 'FALSE' ]
@@ -44584,7 +44588,7 @@ const getEnv = (key) => {
 	return val
 }
 
-const getValue = (key, type) => {
+const getValue = (key, type = 'string') => {
 
 	const val = getEnv(key)
 	if (!val) return undefined
@@ -44597,48 +44601,11 @@ const getValue = (key, type) => {
 		return parseBoolean(val)
 	}
 
-	if (type === 'kvArray') {
-		const bindings = parseArray(val)
-		if (bindings) {
-			const namespaces = []
-			bindings.forEach((binding) => {
-				const id = getEnv(`kv_namespace_id_${ binding }`)
-				if (!id) return
-
-				const preview = getEnv(`kv_namespace_preview_id_${ binding }`)
-				if (!preview) return
-
-				namespaces.push({
-					binding: binding,
-					id: id,
-					preview_id: preview
-				})
-			})
-
-			return namespaces
-		}
-
-		return undefined
-	}
-
 	return val.trim()
 }
 
-const getEnvVariables = () => {
-
-	const variables = {}
-
-	wranglerOptions.forEach((option) => {
-		const val = getValue(option.key, option.type)
-
-		if (val !== undefined) variables[option.key] = val
-	})
-
-	return variables
-}
-
 module.exports = {
-	getEnvVariables
+	getValue
 }
 
 /***/ }),
@@ -44647,7 +44614,7 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const { logger } = __nccwpck_require__(54269)
-const { getEnvVariables } = __nccwpck_require__(40569)
+const { getValue } = __nccwpck_require__(40569)
 const { parseTemplate, writeConfig } = __nccwpck_require__(74962)
 
 // From https://github.com/toniov/p-iteration/blob/master/lib/static-methods.js - MIT © Antonio V
@@ -44661,9 +44628,9 @@ const forEach = async (array, callback) => {
 module.exports = {
 	forEach,
 	logger,
-	getEnvVariables,
 	parseTemplate,
-	writeConfig
+	writeConfig,
+	getValue
 }
 
 /***/ }),
@@ -45028,7 +44995,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"worker-setup","version":"0.1.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup#readme","author":"Maximilian Schiller <schiller@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
+module.exports = JSON.parse('{"name":"worker-setup","version":"1.1.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup#readme","author":"Maximilian Schiller <schiller@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
 
 /***/ }),
 

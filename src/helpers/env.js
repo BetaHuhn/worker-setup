@@ -1,7 +1,5 @@
 require('dotenv').config()
 
-const { wranglerOptions } = require('../Constants')
-
 const parseBoolean = (val) => {
 	const trueValue = [ 'true', 'True', 'TRUE' ]
 	const falseValue = [ 'false', 'False', 'FALSE' ]
@@ -28,7 +26,7 @@ const getEnv = (key) => {
 	return val
 }
 
-const getValue = (key, type) => {
+const getValue = (key, type = 'string') => {
 
 	const val = getEnv(key)
 	if (!val) return undefined
@@ -41,46 +39,9 @@ const getValue = (key, type) => {
 		return parseBoolean(val)
 	}
 
-	if (type === 'kvArray') {
-		const bindings = parseArray(val)
-		if (bindings) {
-			const namespaces = []
-			bindings.forEach((binding) => {
-				const id = getEnv(`kv_namespace_id_${ binding }`)
-				if (!id) return
-
-				const preview = getEnv(`kv_namespace_preview_id_${ binding }`)
-				if (!preview) return
-
-				namespaces.push({
-					binding: binding,
-					id: id,
-					preview_id: preview
-				})
-			})
-
-			return namespaces
-		}
-
-		return undefined
-	}
-
 	return val.trim()
 }
 
-const getEnvVariables = () => {
-
-	const variables = {}
-
-	wranglerOptions.forEach((option) => {
-		const val = getValue(option.key, option.type)
-
-		if (val !== undefined) variables[option.key] = val
-	})
-
-	return variables
-}
-
 module.exports = {
-	getEnvVariables
+	getValue
 }

@@ -1,5 +1,5 @@
 const { logger } = require('./log')
-const { getEnvVariables } = require('./env')
+const { getValue } = require('./env')
 const { parseTemplate, writeConfig } = require('./toml')
 
 // From https://github.com/toniov/p-iteration/blob/master/lib/static-methods.js - MIT © Antonio V
@@ -13,7 +13,7 @@ const forEach = async (array, callback) => {
 module.exports = {
 	forEach,
 	logger,
-	getEnvVariables,
 	parseTemplate,
-	writeConfig
+	writeConfig,
+	getValue
 }
