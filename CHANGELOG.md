@@ -1,3 +1,11 @@
+## [v1.4.1] - 2021-05-07
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.1) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.0...v1.4.1) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.1) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.1.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.1.tar.gz))
+
+### Bug fixes
+
+- [`2489cb1`](https://github.com/BetaHuhn/worker-setup/commit/2489cb1)  Store changed name before running wrangler
+
 ## [v1.4.0] - 2021-05-07
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.0) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.3.0...v1.4.0) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.0) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.0.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.0.tar.gz))
