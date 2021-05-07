@@ -1,6 +1,6 @@
 const { logger } = require('./log')
 const { getValue } = require('./env')
-const { parseTemplate, writeConfig } = require('./toml')
+const { parseToml, writeToml, addToGitIgnore } = require('./fs')
 
 // From https://github.com/toniov/p-iteration/blob/master/lib/static-methods.js - MIT © Antonio V
 const forEach = async (array, callback) => {
@@ -13,7 +13,8 @@ const forEach = async (array, callback) => {
 module.exports = {
 	forEach,
 	logger,
-	parseTemplate,
-	writeConfig,
-	getValue
+	parseToml,
+	writeToml,
+	getValue,
+	addToGitIgnore
 }

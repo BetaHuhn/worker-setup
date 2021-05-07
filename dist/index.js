@@ -44081,9 +44081,10 @@ const { performance } = __nccwpck_require__(70630)
 const {
 	forEach,
 	logger,
-	parseTemplate,
-	writeConfig,
-	getValue
+	parseToml,
+	writeToml,
+	getValue,
+	addToGitIgnore
 } = __nccwpck_require__(79403)
 
 const { wranglerOptions } = __nccwpck_require__(89493)
@@ -44099,7 +44100,7 @@ class Runner {
 
 	async generate() {
 		try {
-			const templateConfig = await parseTemplate(this.options.template)
+			const templateConfig = await parseToml(this.options.template)
 
 			this.log.debug(templateConfig)
 
@@ -44147,7 +44148,7 @@ class Runner {
 
 			this.log.debug(templateConfig)
 
-			await writeConfig(this.options.output, templateConfig)
+			await writeToml(this.options.output, templateConfig)
 
 		} catch (err) {
 			this.log.fail(err.message)
@@ -44161,7 +44162,7 @@ class Runner {
 			this.log.info('Please follow the steps closely. If you want to cancel at anytime, press CTRL+C')
 			this.log.text(`---------------------------------------------------------------------------------`)
 
-			const workerConfig = await parseTemplate(this.options.template)
+			const workerConfig = await parseToml(this.options.template)
 			this.log.debug(workerConfig)
 
 			let accountId = await wrangler.isAuthenticated()
@@ -44174,7 +44175,7 @@ class Runner {
 			}
 
 			workerConfig.account_id = accountId
-			await writeConfig(this.options.output, { ...workerConfig, kv_namespaces: [] })
+			await writeToml(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
 			const workerName = await io.inputName(workerConfig.name)
 			workerConfig.name = workerName
@@ -44373,7 +44374,7 @@ class Runner {
 			this.log.text(`---------------------------------------------------------------------------------`)
 			this.log.load(`Writing final config to ${ this.options.output }`)
 
-			await writeConfig(this.options.output, workerConfig)
+			await writeToml(this.options.output, workerConfig)
 
 			this.log.succeed(`Config written to ${ this.options.output }`)
 			this.log.text(`---------------------------------------------------------------------------------`)
@@ -44450,6 +44451,41 @@ class Runner {
 				return
 			}
 
+			this.log.fail(err.message)
+			this.log.debug(err)
+		}
+	}
+
+	async migrate() {
+		try {
+			this.log.load(`Migrating "${ this.options.input }" to "${ this.options.output }"`)
+
+			const wranglerConfig = await parseToml(this.options.input)
+			this.log.debug(wranglerConfig)
+
+			// Add additional options to config
+			wranglerConfig.kv_namespaces = (wranglerConfig.kv_namespaces || []).map((item) => item.binding)
+			wranglerConfig.variables = Object.entries(wranglerConfig.vars || {}).map(([ key ]) => key)
+			wranglerConfig.recommended_route = ''
+			wranglerConfig.secrets = []
+
+			// Delete options which will be set during setup
+			delete wranglerConfig.workers_dev
+			delete wranglerConfig.account_id
+			delete wranglerConfig.zone_id
+			delete wranglerConfig.routes
+			delete wranglerConfig.route
+			delete wranglerConfig.vars
+
+			await addToGitIgnore(this.options.gitignore, this.options.input)
+			this.log.succeed(`${ this.options.input } added to ${ this.options.gitignore }`)
+
+			await writeToml(this.options.output, wranglerConfig)
+			this.log.succeed(`Transfered config from "${ this.options.input }" to "${ this.options.output }"`)
+
+			this.log.succeed(`Migration successful!`)
+
+		} catch (err) {
 			this.log.fail(err.message)
 			this.log.debug(err)
 		}
@@ -44639,12 +44675,51 @@ module.exports = {
 
 /***/ }),
 
+/***/ 25649:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const fs = __nccwpck_require__(35747).promises
+const TOML = __nccwpck_require__(62901)
+
+const parseToml = async (templatePath) => {
+	try {
+		const raw = await fs.readFile(templatePath)
+		const data = TOML.parse(raw)
+
+		return data
+	} catch (err) {
+		return undefined
+	}
+}
+
+const writeToml = async (outputPath, data) => {
+	const raw = TOML.stringify(data)
+	await fs.writeFile(outputPath, raw)
+}
+
+const addToGitIgnore = async (filePath, data) => {
+	const raw = await fs.readFile(filePath)
+
+	// Check if file is already in .gitignore
+	if (raw.toString().includes(data)) return
+
+	await fs.writeFile(filePath, `\n${ data }`, { flag: 'a+' })
+}
+
+module.exports = {
+	parseToml,
+	writeToml,
+	addToGitIgnore
+}
+
+/***/ }),
+
 /***/ 79403:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const { logger } = __nccwpck_require__(54269)
 const { getValue } = __nccwpck_require__(40569)
-const { parseTemplate, writeConfig } = __nccwpck_require__(74962)
+const { parseToml, writeToml, addToGitIgnore } = __nccwpck_require__(25649)
 
 // From https://github.com/toniov/p-iteration/blob/master/lib/static-methods.js - MIT © Antonio V
 const forEach = async (array, callback) => {
@@ -44657,9 +44732,10 @@ const forEach = async (array, callback) => {
 module.exports = {
 	forEach,
 	logger,
-	parseTemplate,
-	writeConfig,
-	getValue
+	parseToml,
+	writeToml,
+	getValue,
+	addToGitIgnore
 }
 
 /***/ }),
@@ -44741,35 +44817,6 @@ const logger = (logEnabled) => {
 
 module.exports = {
 	logger
-}
-
-/***/ }),
-
-/***/ 74962:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const fs = __nccwpck_require__(35747).promises
-const TOML = __nccwpck_require__(62901)
-
-const parseTemplate = async (templatePath) => {
-	try {
-		const raw = await fs.readFile(templatePath)
-		const data = TOML.parse(raw)
-
-		return data
-	} catch (err) {
-		return undefined
-	}
-}
-
-const writeConfig = async (outputPath, data) => {
-	const raw = TOML.stringify(data)
-	await fs.writeFile(outputPath, raw)
-}
-
-module.exports = {
-	parseTemplate,
-	writeConfig
 }
 
 /***/ }),
@@ -45060,7 +45107,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"worker-setup","version":"1.1.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup#readme","author":"Maximilian Schiller <schiller@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
+module.exports = JSON.parse('{"name":"worker-setup","version":"1.2.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup#readme","author":"Maximilian Schiller <schiller@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
 
 /***/ }),
 
@@ -45244,7 +45291,6 @@ program
 	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
 	.option('-e, --env <path>', 'path to .env file')
 
-	.option('-l, --log', 'enable console log output', false)
 	.option('-d, --debug', 'enable debug mode', false)
 	.action((options) => {
 		const runner = new Runner(null, options)
@@ -45259,11 +45305,24 @@ program
 	.option('-t, --template <path>', 'path to the wrangler.toml template', 'workerConfig.toml')
 	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
 
-	.option('-l, --log', 'enable console log output', false)
 	.option('-d, --debug', 'enable debug mode', false)
 	.action((options) => {
 		const runner = new Runner(null, options)
 		runner.setup()
+	})
+
+program
+	.command('migrate')
+	.description('Will migrate your old wrangler.toml to a new workerConfig.toml')
+
+	.option('-i, --input <path>', 'path to the old wrangler.toml file', 'wrangler.toml')
+	.option('-o, --output <path>', 'path to the output workerConfig.toml', 'workerConfig.toml')
+	.option('-g, --gitignore <path>', 'path to .gitignore file', '.gitignore')
+
+	.option('-d, --debug', 'enable debug mode', false)
+	.action((options) => {
+		const runner = new Runner(null, options)
+		runner.migrate()
 	})
 
 program.on('command:*', (operands) => {

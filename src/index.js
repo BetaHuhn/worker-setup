@@ -16,7 +16,6 @@ program
 	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
 	.option('-e, --env <path>', 'path to .env file')
 
-	.option('-l, --log', 'enable console log output', false)
 	.option('-d, --debug', 'enable debug mode', false)
 	.action((options) => {
 		const runner = new Runner(null, options)
@@ -31,11 +30,24 @@ program
 	.option('-t, --template <path>', 'path to the wrangler.toml template', 'workerConfig.toml')
 	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
 
-	.option('-l, --log', 'enable console log output', false)
 	.option('-d, --debug', 'enable debug mode', false)
 	.action((options) => {
 		const runner = new Runner(null, options)
 		runner.setup()
+	})
+
+program
+	.command('migrate')
+	.description('Will migrate your old wrangler.toml to a new workerConfig.toml')
+
+	.option('-i, --input <path>', 'path to the old wrangler.toml file', 'wrangler.toml')
+	.option('-o, --output <path>', 'path to the output workerConfig.toml', 'workerConfig.toml')
+	.option('-g, --gitignore <path>', 'path to .gitignore file', '.gitignore')
+
+	.option('-d, --debug', 'enable debug mode', false)
+	.action((options) => {
+		const runner = new Runner(null, options)
+		runner.migrate()
 	})
 
 program.on('command:*', (operands) => {

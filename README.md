@@ -26,19 +26,33 @@ See [below]() on how to configure [worker-setup](https://github.com/BetaHuhn/wor
 
 ## 📚 Usage
 
+Run `worker-setup help` to see all available commands and options.
+
+Here's an overview of the available commands:
+
+### Start
+
 ```
 worker-setup start
 ```
 
 Will start the interactive setup process. Required KV Namespaces are automatically created and the user is asked to input all required secrets and environment variables. The final `wrangler.toml` will be generated from the template.
 
----
+### Generate
 
 ```
 worker-setup generate
 ```
 
 Will use a local `workerConfig.toml` and environment variables/.env file to generate a `wrangler.toml` (useful for CI purposes).
+
+### Migrate
+
+```
+worker-setup migrate
+```
+
+Will migrate your old `wrangler.toml` to a new `workerConfig.toml` by removing all personal fields, like account/zone id as well as the ids for kv_namespaces and values for environment variables and adding `wrangler.toml` to your `.gitignore` file. All other options will be transfered to the new config.
 
 ## 🛠️ Setup
 

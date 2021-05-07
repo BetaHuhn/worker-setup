@@ -3,9 +3,10 @@ const { performance } = require('perf_hooks')
 const {
 	forEach,
 	logger,
-	parseTemplate,
-	writeConfig,
-	getValue
+	parseToml,
+	writeToml,
+	getValue,
+	addToGitIgnore
 } = require('./helpers')
 
 const { wranglerOptions } = require('./Constants')
@@ -21,7 +22,7 @@ class Runner {
 
 	async generate() {
 		try {
-			const templateConfig = await parseTemplate(this.options.template)
+			const templateConfig = await parseToml(this.options.template)
 
 			this.log.debug(templateConfig)
 
@@ -69,7 +70,7 @@ class Runner {
 
 			this.log.debug(templateConfig)
 
-			await writeConfig(this.options.output, templateConfig)
+			await writeToml(this.options.output, templateConfig)
 
 		} catch (err) {
 			this.log.fail(err.message)
@@ -83,7 +84,7 @@ class Runner {
 			this.log.info('Please follow the steps closely. If you want to cancel at anytime, press CTRL+C')
 			this.log.text(`---------------------------------------------------------------------------------`)
 
-			const workerConfig = await parseTemplate(this.options.template)
+			const workerConfig = await parseToml(this.options.template)
 			this.log.debug(workerConfig)
 
 			let accountId = await wrangler.isAuthenticated()
@@ -96,7 +97,7 @@ class Runner {
 			}
 
 			workerConfig.account_id = accountId
-			await writeConfig(this.options.output, { ...workerConfig, kv_namespaces: [] })
+			await writeToml(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
 			const workerName = await io.inputName(workerConfig.name)
 			workerConfig.name = workerName
@@ -295,7 +296,7 @@ class Runner {
 			this.log.text(`---------------------------------------------------------------------------------`)
 			this.log.load(`Writing final config to ${ this.options.output }`)
 
-			await writeConfig(this.options.output, workerConfig)
+			await writeToml(this.options.output, workerConfig)
 
 			this.log.succeed(`Config written to ${ this.options.output }`)
 			this.log.text(`---------------------------------------------------------------------------------`)
@@ -372,6 +373,41 @@ class Runner {
 				return
 			}
 
+			this.log.fail(err.message)
+			this.log.debug(err)
+		}
+	}
+
+	async migrate() {
+		try {
+			this.log.load(`Migrating "${ this.options.input }" to "${ this.options.output }"`)
+
+			const wranglerConfig = await parseToml(this.options.input)
+			this.log.debug(wranglerConfig)
+
+			// Add additional options to config
+			wranglerConfig.kv_namespaces = (wranglerConfig.kv_namespaces || []).map((item) => item.binding)
+			wranglerConfig.variables = Object.entries(wranglerConfig.vars || {}).map(([ key ]) => key)
+			wranglerConfig.recommended_route = ''
+			wranglerConfig.secrets = []
+
+			// Delete options which will be set during setup
+			delete wranglerConfig.workers_dev
+			delete wranglerConfig.account_id
+			delete wranglerConfig.zone_id
+			delete wranglerConfig.routes
+			delete wranglerConfig.route
+			delete wranglerConfig.vars
+
+			await addToGitIgnore(this.options.gitignore, this.options.input)
+			this.log.succeed(`${ this.options.input } added to ${ this.options.gitignore }`)
+
+			await writeToml(this.options.output, wranglerConfig)
+			this.log.succeed(`Transfered config from "${ this.options.input }" to "${ this.options.output }"`)
+
+			this.log.succeed(`Migration successful!`)
+
+		} catch (err) {
 			this.log.fail(err.message)
 			this.log.debug(err)
 		}
