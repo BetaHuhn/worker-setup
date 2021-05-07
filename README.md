@@ -21,7 +21,7 @@ The basic wrangler configuration, required KV Namespaces, secrets and environmen
 - Automatically creates required KV Namespaces
 - Prompts the user for required Secrets and Environment Variables (and uploads them)
 - Lets the user choose between deploying to [workers.dev](https://workers.dev) or a custom Zone
-- Can dynamicly fill wrangler.toml with user specific values using environment variables (useful for CI)
+- Can dynamically fill wrangler.toml with user specific values using environment variables (useful for CI)
 
 ## 🚀 Get started
 
@@ -124,7 +124,7 @@ Here are example intructions you can use in the README for your Worker:
 
 ---
 
-Clone this repo and cd into it:
+If you want to deploy this Worker yourself, clone this repo and cd into it:
 
 ```shell
 git clone https://github.com/betahuhn/cf-worker-redirect && cd cf-worker-redirect
@@ -136,7 +136,7 @@ Next start the interactive deployment process:
 worker-setup deploy
 ```
 
-You will be asked to login to CloudFlare if not already authenticated. The programm will guide you through the process of setting up and deploying the Worker.
+You will be asked to login to CloudFlare if not already authenticated. The programm will guide you through the process of setting up and deploying the Worker under your own CloudFlare Account.
 
 ---
 
