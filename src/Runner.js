@@ -68,6 +68,9 @@ class Runner {
 			workerConfig.account_id = accountId
 			await writeConfig(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
+			const workerName = await io.inputName(workerConfig.name)
+			workerConfig.name = workerName
+
 			if (workerConfig.kv_namespaces) {
 				this.log.info(`The Worker you are trying to deploy uses Workers KV storage.`)
 

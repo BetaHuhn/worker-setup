@@ -16,6 +16,23 @@ const inputAccountId = async () => {
 	})
 }
 
+const inputName = async (defaultName) => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'input',
+					name: 'name',
+					message: `Worker Name:`,
+					...(defaultName && { default: defaultName })
+				}
+			])
+			.then((answers) => {
+				resolve(answers.name)
+			})
+	})
+}
+
 const confirmNamespaceCreation = async () => {
 	return new Promise((resolve) => {
 		inquirer
@@ -140,6 +157,7 @@ const inputRoutes = async () => {
 
 module.exports = {
 	inputAccountId,
+	inputName,
 	confirmNamespaceCreation,
 	confirmPublish,
 	confirmSecretAdding,

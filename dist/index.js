@@ -44170,6 +44170,9 @@ class Runner {
 			workerConfig.account_id = accountId
 			await writeConfig(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
+			const workerName = await io.inputName(workerConfig.name)
+			workerConfig.name = workerName
+
 			if (workerConfig.kv_namespaces) {
 				this.log.info(`The Worker you are trying to deploy uses Workers KV storage.`)
 
@@ -44796,6 +44799,23 @@ const inputAccountId = async () => {
 	})
 }
 
+const inputName = async (defaultName) => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'input',
+					name: 'name',
+					message: `Worker Name:`,
+					...(defaultName && { default: defaultName })
+				}
+			])
+			.then((answers) => {
+				resolve(answers.name)
+			})
+	})
+}
+
 const confirmNamespaceCreation = async () => {
 	return new Promise((resolve) => {
 		inquirer
@@ -44920,6 +44940,7 @@ const inputRoutes = async () => {
 
 module.exports = {
 	inputAccountId,
+	inputName,
 	confirmNamespaceCreation,
 	confirmPublish,
 	confirmSecretAdding,
