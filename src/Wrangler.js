@@ -1,8 +1,10 @@
 const { execCmd } = require('./helpers/cmd')
 
+const wranglerBin = 'node_modules/.bin/wrangler'
+
 const isAuthenticated = async () => {
 	try {
-		const output = await execCmd(`wrangler whoami`)
+		const output = await execCmd(`${ wranglerBin } whoami`)
 
 		const rgx = /\|\s([\w\d]*)\s*\|\s([\w\d]*)\s*\|/g
 		const matches = rgx.exec(output)
@@ -15,7 +17,7 @@ const isAuthenticated = async () => {
 
 const getNamespaces = async (accountId) => {
 	try {
-		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler kv:namespace list`)
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } ${ wranglerBin } kv:namespace list`)
 
 		return JSON.parse(output)
 	} catch (err) {
@@ -25,7 +27,7 @@ const getNamespaces = async (accountId) => {
 
 const createNamespace = async (accountId, name) => {
 	try {
-		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler kv:namespace create ${ name }`)
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } ${ wranglerBin } kv:namespace create ${ name }`)
 
 		const rgx = /id\s=\s"(\w*\d*)"/
 		const match = rgx.exec(output)
@@ -42,7 +44,7 @@ const createNamespace = async (accountId, name) => {
 
 const getSecrets = async (accountId) => {
 	try {
-		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler secret list`)
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } ${ wranglerBin } secret list`)
 
 		return JSON.parse(output)
 	} catch (err) {
@@ -52,7 +54,7 @@ const getSecrets = async (accountId) => {
 
 const saveSecret = async (accountId, key, value) => {
 	try {
-		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } echo ${ value } | wrangler secret put ${ key }`)
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } echo ${ value } | ${ wranglerBin } secret put ${ key }`)
 
 		if (!output.includes('Success')) throw { name: 'SAVESECRET', data: key }
 
@@ -65,7 +67,7 @@ const saveSecret = async (accountId, key, value) => {
 const publishWorker = async (accountId) => {
 	try {
 
-		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler publish`)
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } ${ wranglerBin } publish`)
 
 		if (!output.toLowerCase().includes('successfully')) throw { name: 'PUBLISHWORKER' }
 
