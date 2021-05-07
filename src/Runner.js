@@ -54,21 +54,12 @@ class Runner {
 			this.log.text(`---------------------------------------------------------------------------------`)
 
 			const workerConfig = await parseTemplate(this.options.template)
-
 			this.log.debug(workerConfig)
 
-			const isAuthenticated = await wrangler.isAuthenticated()
+			let accountId = await wrangler.isAuthenticated()
+			this.log.debug(accountId)
 
-			this.log.debug(isAuthenticated)
-
-			if (!isAuthenticated) {
-				this.log.fail(`Could not authenticate with CloudFlare, please login with CloudFlare before setting up the Worker.`)
-				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` and then return to the setup.`)
-				process.exit(0)
-			}
-
-			let accountId = isAuthenticated
-			if (typeof isAuthenticated !== 'string') {
+			if (!accountId) {
 				this.log.fail(`Could not get your Account ID automatically.`)
 				this.log.info(`Visit your Workers Dashboard (https://dash.cloudflare.com/?to=/:account/workers) and paste your Account ID below:`)
 				accountId = await io.inputAccountId()
@@ -132,12 +123,6 @@ class Runner {
 						this.log.changeText(`Creating Namespace "${ namespace }"...`)
 
 						const id = await wrangler.createNamespace(accountId, namespace)
-
-						if (!id) {
-							this.log.fail(`Could not create Namespace "${ namespace }"`)
-							this.log.warn(`Run \`wrangler kv:namespace create ${ namespace }\` to create the Namespace manually.`)
-							process.exit(0)
-						}
 
 						finalNamespaces.push({
 							binding: namespace,
@@ -208,13 +193,8 @@ class Runner {
 
 					await forEach(Object.entries(values), async ([ key, val ]) => {
 						this.log.changeText(`Uploading "${ key }"...`)
-						const saved = await wrangler.saveSecret(accountId, key, val)
 
-						if (!saved) {
-							this.log.fail(`Could not create Secret "${ key }"`)
-							this.log.warn(`Run \`wrangler secret put ${ key }\` to create the Secret manually.`)
-							process.exit(0)
-						}
+						await wrangler.saveSecret(accountId, key, val)
 
 						finalVariables.push(key)
 					})
@@ -242,13 +222,7 @@ class Runner {
 			this.log.load(`Deploying your Worker...`)
 
 			const t0 = performance.now()
-
 			const published = await wrangler.publishWorker(accountId)
-			if (!published) {
-				this.log.fail(`Could not deploy the Worker.`)
-				this.log.warn(`Run \`wrangler publish\` to deploy your Worker manually.`)
-				process.exit(0)
-			}
 
 			const t1 = performance.now()
 			const diff = t1 - t0
@@ -261,6 +235,53 @@ class Runner {
 			this.log.succeed(`Success! Your Worker was deployed to https://${ published.domain } 🚀`)
 
 		} catch (err) {
+
+			if (err.name === 'NOAUTH') {
+				this.log.fail(`Could not authenticate with CloudFlare, please login with CloudFlare before setting up the Worker.`)
+				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` and then return to the setup.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'SECRETLIST') {
+				this.log.fail(`Could not get your current secrets`)
+				this.log.warn(`Run \`wrangler secret list\` to debug the error.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'NAMESPACELIST') {
+				this.log.fail(`Could not get your existing Namespaces`)
+				this.log.warn(`Run \`wrangler kv:namespace list\` to debug the error.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'CREATENAMESPACE') {
+				this.log.fail(`Could not create Namespace "${ err.data }"`)
+				this.log.warn(`Run \`wrangler kv:namespace create ${ err.data }\` to create the Namespace manually.`)
+				return
+			}
+
+			if (err.name === 'SAVESECRET') {
+				this.log.fail(`Could not create Secret "${ err.data }"`)
+				this.log.warn(`Run \`wrangler secret put ${ err.data }\` to create the Secret manually.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'PUBLISHWORKER') {
+				this.log.fail(`Could not deploy the Worker.`)
+				this.log.warn(`Run \`wrangler publish\` to deploy your Worker manually.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
 			this.log.fail(err.message)
 			this.log.debug(err)
 		}
