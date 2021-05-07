@@ -86,8 +86,9 @@ const inputSecrets = async (secrets) => {
 		inquirer
 			.prompt(secrets.map((secret) => {
 				return {
-					type: 'input',
+					type: 'password',
 					name: secret,
+					mask: '*',
 					message: `Enter a value for "${ secret }":`
 				}
 			}))
