@@ -9,10 +9,24 @@ program
 	.description(packageJson.description)
 
 program
-	.command('generate')
-	.description('Use environment variables to generate wrangler.toml from template')
+	.command('start')
+	.alias('deploy')
+	.description('Interactive setup and deployment of Worker based on Worker config file')
 
-	.option('-t, --template <path>', 'path to the wrangler.toml template', 'workerConfig.toml')
+	.option('-t, --template <path>', 'path to the Worker config file', 'workerConfig.toml')
+	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
+
+	.option('-d, --debug', 'enable debug mode', false)
+	.action((options) => {
+		const runner = new Runner(null, options)
+		runner.setup()
+	})
+
+program
+	.command('generate')
+	.description('Generate wrangler.toml from Worker config file using environment variables')
+
+	.option('-t, --template <path>', 'path to the Worker config file', 'workerConfig.toml')
 	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
 	.option('-e, --env <path>', 'path to .env file')
 
@@ -20,20 +34,6 @@ program
 	.action((options) => {
 		const runner = new Runner(null, options)
 		runner.generate()
-	})
-
-program
-	.command('start')
-	.alias('deploy')
-	.description('Inteactive generation of wrangler.toml from template')
-
-	.option('-t, --template <path>', 'path to the wrangler.toml template', 'workerConfig.toml')
-	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
-
-	.option('-d, --debug', 'enable debug mode', false)
-	.action((options) => {
-		const runner = new Runner(null, options)
-		runner.setup()
 	})
 
 program
