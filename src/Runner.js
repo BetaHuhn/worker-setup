@@ -130,10 +130,11 @@ class Runner {
 			}
 
 			workerConfig.account_id = accountId
-			await writeToml(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
 			const workerName = await io.inputName(workerConfig.name)
 			workerConfig.name = workerName
+
+			await writeToml(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
 			if (workerConfig.kv_namespaces) {
 				this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))

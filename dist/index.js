@@ -46163,10 +46163,11 @@ class Runner {
 			}
 
 			workerConfig.account_id = accountId
-			await writeToml(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
 			const workerName = await io.inputName(workerConfig.name)
 			workerConfig.name = workerName
+
+			await writeToml(this.options.output, { ...workerConfig, kv_namespaces: [] })
 
 			if (workerConfig.kv_namespaces) {
 				this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
@@ -47258,7 +47259,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"worker-setup","version":"1.3.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup","author":"Maximilian Schiller <hello@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@cloudflare/wrangler":"^1.16.1","@iarna/toml":"^2.2.5","chalk":"^4.1.1","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
+module.exports = JSON.parse('{"name":"worker-setup","version":"1.4.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup","author":"Maximilian Schiller <hello@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@cloudflare/wrangler":"^1.16.1","@iarna/toml":"^2.2.5","chalk":"^4.1.1","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
 
 /***/ }),
 
