@@ -40,7 +40,7 @@ const confirmNamespaceCreation = async () => {
 				{
 					type: 'confirm',
 					name: 'create',
-					message: `Create the missing Namespaces automatically?`
+					message: `Create the missing namespaces automatically?`
 				}
 			])
 			.then((answers) => {
@@ -105,7 +105,7 @@ const confirmVariableAdding = async () => {
 				{
 					type: 'confirm',
 					name: 'add',
-					message: `Do you want to add the missing Variables now?`
+					message: `Do you want to add the missing variables now?`
 				}
 			])
 			.then((answers) => {
