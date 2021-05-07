@@ -1,6 +1,6 @@
 <div align="center">
 
-# Wrangler Config
+# Worker Setup
 
 [![Node CI](https://github.com/BetaHuhn/worker-setup/workflows/Node%20CI/badge.svg)](https://github.com/BetaHuhn/worker-setup/actions?query=workflow%3A%22Node+CI%22) [![Release CI](https://github.com/BetaHuhn/worker-setup/workflows/Release%20CI/badge.svg)](https://github.com/BetaHuhn/worker-setup/actions?query=workflow%3A%22Release+CI%22) [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/BetaHuhn/worker-setup/blob/master/LICENSE) ![David](https://img.shields.io/david/betahuhn/worker-setup)
 
@@ -12,7 +12,7 @@ Interactive setup and deployment of pre-made CloudFlare Workers
 
 While `wrangler generate` is meant to generate a completely new worker from an existing template, `worker-setup` is meant to setup a pre-made Worker like [cf-worker-redirect](https://github.com/BetaHuhn/cf-worker-redirect).
 
-The basic wrangler configuration, required KV Namespaces and Environment variables are stored in `workerConfig.toml` file. When a user wants to setup your Worker, they can simply run `worker-setup setup` and they will be guided through the process of setting up and deploying the Worker. Required KV Namespaces are automatically created and the user is asked to input all required Environment variables.
+The basic wrangler configuration, required KV Namespaces and Environment variables are stored in the `workerConfig.toml` file. When a user wants to setup your Worker, they can simply run `worker-setup start` and they will be guided through the process of setting up and deploying the Worker. Required KV Namespaces are automatically created and the user is asked to input all required Environment variables.
 
 ## 🚀 Get started
 
@@ -25,7 +25,7 @@ npm install worker-setup
 Start the setup process:
 
 ```shell
-worker-setup setup
+worker-setup start
 ```
 
 > Requires a local workerConfig.toml file
@@ -33,18 +33,18 @@ worker-setup setup
 ## 📚 Usage
 
 ```
-worker-setup generate
+worker-setup setup
 ```
 
-Will use a local `workerConfig.toml` and environment variables/.env file to generate a `wrangler.toml`
+Will start the interactive setup process. Required KV Namespaces are automatically created and the user is asked to input all required Environment variables. The final `wrangler.toml` will be generated from the template.
 
 ---
 
 ```
-worker-setup setup
+worker-setup generate
 ```
 
-Will start interactive setup process. Required KV Namespaces are automatically created and the user is asked to input all required Environment variables. The final `wrangler.toml` will be generated from the template.
+Will use a local `workerConfig.toml` and environment variables/.env file to generate a `wrangler.toml`
 
 ## ⚙️ Configuration
 
@@ -77,16 +77,10 @@ git clone https://github.com/betahuhn/cf-worker-redirect && cd cf-worker-redirec
 Next start the interactive setup process:
 
 ```shell
-worker-setup setup
+worker-setup start
 ```
 
-You will be asked to input a few values specific to your CloudFlare Account and the Worker will be deployed.
-
-You can also manually publish the Worker with:
-
-```shell
-worker-setup publish
-```
+You will be asked to input a few values specific to your CloudFlare Account and the programm will guide through the process of deploying the Worker.
 
 ## 💻 Development
 
