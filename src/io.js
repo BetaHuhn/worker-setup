@@ -80,10 +80,71 @@ const inputVariables = async (variables) => {
 	})
 }
 
+const selectDomainType = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'list',
+					name: 'deploy',
+					message: `Where do you want to deploy the Worker to?`,
+					choices: [
+						'Deploy to workers.dev subdomain',
+						'Deploy to your own zone'
+					]
+				}
+			])
+			.then((answers) => {
+				resolve(answers.deploy)
+			})
+	})
+}
+
+const inputZoneId = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'input',
+					name: 'zoneId',
+					message: `Zone ID:`,
+					validate: (value) => {
+						return value.length > 0
+					}
+				}
+			])
+			.then((answers) => {
+				resolve(answers.zoneId)
+			})
+	})
+}
+
+const inputRoutes = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'input',
+					name: 'routes',
+					message: 'Enter a route for your Worker (seperate multiple routes with ","):',
+					validate: (value) => {
+						return value.length > 4
+					}
+				}
+			])
+			.then((answers) => {
+				resolve(answers.routes.split(',').map((item) => item.trim()))
+			})
+	})
+}
+
 module.exports = {
 	inputAccountId,
 	confirmNamespaceCreation,
 	confirmPublish,
 	confirmSecretAdding,
-	inputVariables
+	inputVariables,
+	selectDomainType,
+	inputZoneId,
+	inputRoutes
 }

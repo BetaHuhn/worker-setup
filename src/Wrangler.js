@@ -67,19 +67,17 @@ const publishWorker = async (accountId) => {
 
 		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler publish`)
 
-		if (!output.includes('successfully')) return undefined
+		if (!output.toLowerCase().includes('successfully')) throw { name: 'PUBLISHWORKER' }
 
 		const domainRgx = /https:\/\/(.*)/
 		const matchDomain = domainRgx.exec(output)
-
-		if (!matchDomain[1]) throw { name: 'PUBLISHWORKER' }
 
 		const sizeRgx = /project size is (.*)\./
 		const sizeMatch = sizeRgx.exec(output)
 
 		return {
-			domain: matchDomain[1],
-			size: sizeMatch[1]
+			domain: matchDomain && matchDomain[1],
+			size: sizeMatch && sizeMatch[1]
 		}
 	} catch (err) {
 		throw { name: 'PUBLISHWORKER', message: err.message }

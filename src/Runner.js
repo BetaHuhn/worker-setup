@@ -206,6 +206,31 @@ class Runner {
 			}
 
 			this.log.text(`---------------------------------------------------------------------------------`)
+
+			const domainType = await io.selectDomainType()
+			if (domainType === 'Deploy to your own zone') {
+				this.log.info(`Please go to your CloudFlare Dashboard to retrieve your Zone ID`)
+
+				const zoneId = await io.inputZoneId()
+
+				workerConfig.workers_dev = false
+				workerConfig.zone_id = zoneId
+
+				if (workerConfig.recommended_route) {
+					this.log.info(`The author of the Worker suggests the following route: ${ workerConfig.recommended_route } (replace with your Zone)`)
+				}
+
+				const routes = await io.inputRoutes()
+
+				this.log.debug(routes)
+				workerConfig.routes = routes
+
+				this.log.succeed(`Using your Zone "${ zoneId }"`)
+			} else {
+				workerConfig.workers_dev = true
+			}
+
+			this.log.text(`---------------------------------------------------------------------------------`)
 			this.log.load(`Writing final config to ${ this.options.output }`)
 
 			await writeConfig(this.options.output, workerConfig)
@@ -228,11 +253,14 @@ class Runner {
 			const diff = t1 - t0
 
 			this.log.text(`---------------------------------------------------------------------------------`)
+
 			this.log.info(`Built took ${ Math.round((diff / 1000) * 100) / 100 } seconds`)
-			this.log.info(`Built project size is ${ published.size }`)
+			if (published.size) this.log.info(`Built project size is ${ published.size }`)
+
 			this.log.text(`---------------------------------------------------------------------------------`)
 
-			this.log.succeed(`Success! Your Worker was deployed to https://${ published.domain } 🚀`)
+			const domain = published.domain ? `https://${ published.domain }` : workerConfig.routes.join(', ')
+			this.log.succeed(`Success! Your Worker was deployed to ${ domain } 🚀`)
 
 		} catch (err) {
 
