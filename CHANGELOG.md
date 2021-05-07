@@ -1,3 +1,15 @@
+## [v1.3.0] - 2021-05-07
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.3.0) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.2.0...v1.3.0) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.3.0) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.3.0.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.3.0.tar.gz))
+
+### New features
+
+- [`6117958`](https://github.com/BetaHuhn/worker-setup/commit/6117958)  Add migrate command
+
+### Updates
+
+- [`137efb7`](https://github.com/BetaHuhn/worker-setup/commit/137efb7)  Change help output, option parsing and prefered command
+
 ## [v1.2.0] - 2021-05-07
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.2.0) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.1.0...v1.2.0) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.2.0) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.2.0.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.2.0.tar.gz))
