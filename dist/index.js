@@ -44128,8 +44128,8 @@ class Runner {
 				templateConfig.kv_namespaces = finalNamespaces
 			}
 
-			const variables = templateConfig.environment_variables
-			delete templateConfig.environment_variables
+			const variables = templateConfig.variables
+			delete templateConfig.variables
 
 			const finalVariables = {}
 			if (variables) {
@@ -44314,6 +44314,35 @@ class Runner {
 				} else {
 					this.log.succeed(`All required secrets already exist`)
 				}
+
+				delete workerConfig.secrets
+			}
+
+			this.log.text(`---------------------------------------------------------------------------------`)
+
+			if (workerConfig.variables) {
+				this.log.info(`The Worker you are trying to deploy requires one or more environment variables`)
+
+				this.log.info(`The following variables are needed:`)
+				this.log.text('')
+
+				workerConfig.variables.forEach((variableKey) => {
+					console.log(`- ${ variableKey } (needs to be created)`)
+				})
+
+				this.log.text('')
+
+				const askForVariables = await io.confirmVariableAdding()
+				if (!askForVariables) {
+					this.log.warn(`Please add the following variables yourself before continuing: ${ workerConfig.variables.join(', ') }`)
+					process.exit(0)
+				}
+
+				const variables = await io.inputVariables(workerConfig.variables)
+				this.log.debug(variables)
+
+				workerConfig.vars = variables
+				delete workerConfig.variables
 			}
 
 			this.log.text(`---------------------------------------------------------------------------------`)
@@ -44822,7 +44851,7 @@ const confirmSecretAdding = async () => {
 				{
 					type: 'confirm',
 					name: 'add',
-					message: `Do you want to add the missing Variables now?`
+					message: `Do you want to add the missing secrets now?`
 				}
 			])
 			.then((answers) => {
@@ -44839,6 +44868,39 @@ const inputSecrets = async (secrets) => {
 					type: 'input',
 					name: secret,
 					message: `Enter a value for "${ secret }":`
+				}
+			}))
+			.then((answers) => {
+				resolve(answers)
+			})
+	})
+}
+
+const confirmVariableAdding = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'confirm',
+					name: 'add',
+					message: `Do you want to add the missing Variables now?`
+				}
+			])
+			.then((answers) => {
+				resolve(answers.add)
+			})
+	})
+}
+
+
+const inputVariables = async (variables) => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt(variables.map((variable) => {
+				return {
+					type: 'input',
+					name: variable,
+					message: `Enter a value for "${ variable }":`
 				}
 			}))
 			.then((answers) => {
@@ -44912,6 +44974,8 @@ module.exports = {
 	confirmPublish,
 	confirmSecretAdding,
 	inputSecrets,
+	confirmVariableAdding,
+	inputVariables,
 	selectDomainType,
 	inputZoneId,
 	inputRoutes

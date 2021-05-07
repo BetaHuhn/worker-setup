@@ -72,7 +72,7 @@ const confirmSecretAdding = async () => {
 				{
 					type: 'confirm',
 					name: 'add',
-					message: `Do you want to add the missing Variables now?`
+					message: `Do you want to add the missing secrets now?`
 				}
 			])
 			.then((answers) => {
@@ -89,6 +89,39 @@ const inputSecrets = async (secrets) => {
 					type: 'input',
 					name: secret,
 					message: `Enter a value for "${ secret }":`
+				}
+			}))
+			.then((answers) => {
+				resolve(answers)
+			})
+	})
+}
+
+const confirmVariableAdding = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'confirm',
+					name: 'add',
+					message: `Do you want to add the missing Variables now?`
+				}
+			])
+			.then((answers) => {
+				resolve(answers.add)
+			})
+	})
+}
+
+
+const inputVariables = async (variables) => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt(variables.map((variable) => {
+				return {
+					type: 'input',
+					name: variable,
+					message: `Enter a value for "${ variable }":`
 				}
 			}))
 			.then((answers) => {
@@ -162,6 +195,8 @@ module.exports = {
 	confirmPublish,
 	confirmSecretAdding,
 	inputSecrets,
+	confirmVariableAdding,
+	inputVariables,
 	selectDomainType,
 	inputZoneId,
 	inputRoutes

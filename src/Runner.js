@@ -50,8 +50,8 @@ class Runner {
 				templateConfig.kv_namespaces = finalNamespaces
 			}
 
-			const variables = templateConfig.environment_variables
-			delete templateConfig.environment_variables
+			const variables = templateConfig.variables
+			delete templateConfig.variables
 
 			const finalVariables = {}
 			if (variables) {
@@ -236,6 +236,35 @@ class Runner {
 				} else {
 					this.log.succeed(`All required secrets already exist`)
 				}
+
+				delete workerConfig.secrets
+			}
+
+			this.log.text(`---------------------------------------------------------------------------------`)
+
+			if (workerConfig.variables) {
+				this.log.info(`The Worker you are trying to deploy requires one or more environment variables`)
+
+				this.log.info(`The following variables are needed:`)
+				this.log.text('')
+
+				workerConfig.variables.forEach((variableKey) => {
+					console.log(`- ${ variableKey } (needs to be created)`)
+				})
+
+				this.log.text('')
+
+				const askForVariables = await io.confirmVariableAdding()
+				if (!askForVariables) {
+					this.log.warn(`Please add the following variables yourself before continuing: ${ workerConfig.variables.join(', ') }`)
+					process.exit(0)
+				}
+
+				const variables = await io.inputVariables(workerConfig.variables)
+				this.log.debug(variables)
+
+				workerConfig.vars = variables
+				delete workerConfig.variables
 			}
 
 			this.log.text(`---------------------------------------------------------------------------------`)
