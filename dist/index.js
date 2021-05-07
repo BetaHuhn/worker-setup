@@ -44156,21 +44156,12 @@ class Runner {
 			this.log.text(`---------------------------------------------------------------------------------`)
 
 			const workerConfig = await parseTemplate(this.options.template)
-
 			this.log.debug(workerConfig)
 
-			const isAuthenticated = await wrangler.isAuthenticated()
+			let accountId = await wrangler.isAuthenticated()
+			this.log.debug(accountId)
 
-			this.log.debug(isAuthenticated)
-
-			if (!isAuthenticated) {
-				this.log.fail(`Could not authenticate with CloudFlare, please login with CloudFlare before setting up the Worker.`)
-				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` and then return to the setup.`)
-				process.exit(0)
-			}
-
-			let accountId = isAuthenticated
-			if (typeof isAuthenticated !== 'string') {
+			if (!accountId) {
 				this.log.fail(`Could not get your Account ID automatically.`)
 				this.log.info(`Visit your Workers Dashboard (https://dash.cloudflare.com/?to=/:account/workers) and paste your Account ID below:`)
 				accountId = await io.inputAccountId()
@@ -44234,12 +44225,6 @@ class Runner {
 						this.log.changeText(`Creating Namespace "${ namespace }"...`)
 
 						const id = await wrangler.createNamespace(accountId, namespace)
-
-						if (!id) {
-							this.log.fail(`Could not create Namespace "${ namespace }"`)
-							this.log.warn(`Run \`wrangler kv:namespace create ${ namespace }\` to create the Namespace manually.`)
-							process.exit(0)
-						}
 
 						finalNamespaces.push({
 							binding: namespace,
@@ -44310,13 +44295,8 @@ class Runner {
 
 					await forEach(Object.entries(values), async ([ key, val ]) => {
 						this.log.changeText(`Uploading "${ key }"...`)
-						const saved = await wrangler.saveSecret(accountId, key, val)
 
-						if (!saved) {
-							this.log.fail(`Could not create Secret "${ key }"`)
-							this.log.warn(`Run \`wrangler secret put ${ key }\` to create the Secret manually.`)
-							process.exit(0)
-						}
+						await wrangler.saveSecret(accountId, key, val)
 
 						finalVariables.push(key)
 					})
@@ -44325,6 +44305,31 @@ class Runner {
 				} else {
 					this.log.succeed(`All required Variables/Secrets already exist`)
 				}
+			}
+
+			this.log.text(`---------------------------------------------------------------------------------`)
+
+			const domainType = await io.selectDomainType()
+			if (domainType === 'Deploy to your own zone') {
+				this.log.info(`Please go to your CloudFlare Dashboard to retrieve your Zone ID`)
+
+				const zoneId = await io.inputZoneId()
+
+				workerConfig.workers_dev = false
+				workerConfig.zone_id = zoneId
+
+				if (workerConfig.recommended_route) {
+					this.log.info(`The author of the Worker suggests the following route: ${ workerConfig.recommended_route } (replace with your Zone)`)
+				}
+
+				const routes = await io.inputRoutes()
+
+				this.log.debug(routes)
+				workerConfig.routes = routes
+
+				this.log.succeed(`Using your Zone "${ zoneId }"`)
+			} else {
+				workerConfig.workers_dev = true
 			}
 
 			this.log.text(`---------------------------------------------------------------------------------`)
@@ -44344,25 +44349,69 @@ class Runner {
 			this.log.load(`Deploying your Worker...`)
 
 			const t0 = performance.now()
-
 			const published = await wrangler.publishWorker(accountId)
-			if (!published) {
-				this.log.fail(`Could not deploy the Worker.`)
-				this.log.warn(`Run \`wrangler publish\` to deploy your Worker manually.`)
-				process.exit(0)
-			}
 
 			const t1 = performance.now()
 			const diff = t1 - t0
 
 			this.log.text(`---------------------------------------------------------------------------------`)
+
 			this.log.info(`Built took ${ Math.round((diff / 1000) * 100) / 100 } seconds`)
-			this.log.info(`Built project size is ${ published.size }`)
+			if (published.size) this.log.info(`Built project size is ${ published.size }`)
+
 			this.log.text(`---------------------------------------------------------------------------------`)
 
-			this.log.succeed(`Success! Your Worker was deployed to https://${ published.domain } 🚀`)
+			const domain = published.domain ? `https://${ published.domain }` : workerConfig.routes.join(', ')
+			this.log.succeed(`Success! Your Worker was deployed to ${ domain } 🚀`)
 
 		} catch (err) {
+
+			if (err.name === 'NOAUTH') {
+				this.log.fail(`Could not authenticate with CloudFlare, please login with CloudFlare before setting up the Worker.`)
+				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` and then return to the setup.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'SECRETLIST') {
+				this.log.fail(`Could not get your current secrets`)
+				this.log.warn(`Run \`wrangler secret list\` to debug the error.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'NAMESPACELIST') {
+				this.log.fail(`Could not get your existing Namespaces`)
+				this.log.warn(`Run \`wrangler kv:namespace list\` to debug the error.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'CREATENAMESPACE') {
+				this.log.fail(`Could not create Namespace "${ err.data }"`)
+				this.log.warn(`Run \`wrangler kv:namespace create ${ err.data }\` to create the Namespace manually.`)
+				return
+			}
+
+			if (err.name === 'SAVESECRET') {
+				this.log.fail(`Could not create Secret "${ err.data }"`)
+				this.log.warn(`Run \`wrangler secret put ${ err.data }\` to create the Secret manually.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			if (err.name === 'PUBLISHWORKER') {
+				this.log.fail(`Could not deploy the Worker.`)
+				this.log.warn(`Run \`wrangler publish\` to deploy your Worker manually.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
 			this.log.fail(err.message)
 			this.log.debug(err)
 		}
@@ -44386,20 +44435,20 @@ const isAuthenticated = async () => {
 		const rgx = /\|\s([\w\d]*)\s*\|\s([\w\d]*)\s*\|/g
 		const matches = rgx.exec(output)
 
-		if (matches.length === 3) {
-			return matches[2]
-		}
-
-		return true
+		return matches.length === 3 ? matches[2] : undefined
 	} catch (err) {
-		return false
+		throw { name: 'NOAUTH', message: err.message }
 	}
 }
 
 const getNamespaces = async (accountId) => {
-	const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler kv:namespace list`)
+	try {
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler kv:namespace list`)
 
-	return JSON.parse(output)
+		return JSON.parse(output)
+	} catch (err) {
+		throw { name: 'NAMESPACELIST', message: err.message }
+	}
 }
 
 const createNamespace = async (accountId, name) => {
@@ -44407,46 +44456,25 @@ const createNamespace = async (accountId, name) => {
 		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler kv:namespace create ${ name }`)
 
 		const rgx = /id\s=\s"(\w*\d*)"/
-
 		const match = rgx.exec(output)
 
 		if (!match[1]) {
-			return undefined
+			throw { name: 'CREATENAMESPACE', data: name }
 		}
 
 		return match[1]
 	} catch (err) {
-		return undefined
+		throw { name: 'CREATENAMESPACE', message: err.message }
 	}
 }
 
 const getSecrets = async (accountId) => {
-	const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler secret list`)
-
-	return JSON.parse(output)
-}
-
-const publishWorker = async (accountId) => {
 	try {
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler secret list`)
 
-		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler publish`)
-
-		if (!output.includes('successfully')) return undefined
-
-		const domainRgx = /https:\/\/(.*)/
-		const matchDomain = domainRgx.exec(output)
-
-		if (!matchDomain[1]) return undefined
-
-		const sizeRgx = /project size is (.*)\./
-		const sizeMatch = sizeRgx.exec(output)
-
-		return {
-			domain: matchDomain[1],
-			size: sizeMatch[1]
-		}
+		return JSON.parse(output)
 	} catch (err) {
-		return undefined
+		throw { name: 'SECRETLIST', message: err.message }
 	}
 }
 
@@ -44454,11 +44482,33 @@ const saveSecret = async (accountId, key, value) => {
 	try {
 		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } echo ${ value } | wrangler secret put ${ key }`)
 
-		if (!output.includes('Success')) return false
+		if (!output.includes('Success')) throw { name: 'SAVESECRET', data: key }
 
 		return true
 	} catch (err) {
-		return false
+		throw { name: 'SAVESECRET', message: err.message }
+	}
+}
+
+const publishWorker = async (accountId) => {
+	try {
+
+		const output = await execCmd(`CF_ACCOUNT_ID=${ accountId } wrangler publish`)
+
+		if (!output.toLowerCase().includes('successfully')) throw { name: 'PUBLISHWORKER' }
+
+		const domainRgx = /https:\/\/(.*)/
+		const matchDomain = domainRgx.exec(output)
+
+		const sizeRgx = /project size is (.*)\./
+		const sizeMatch = sizeRgx.exec(output)
+
+		return {
+			domain: matchDomain && matchDomain[1],
+			size: sizeMatch && sizeMatch[1]
+		}
+	} catch (err) {
+		throw { name: 'PUBLISHWORKER', message: err.message }
 	}
 }
 
@@ -44810,12 +44860,73 @@ const inputVariables = async (variables) => {
 	})
 }
 
+const selectDomainType = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'list',
+					name: 'deploy',
+					message: `Where do you want to deploy the Worker to?`,
+					choices: [
+						'Deploy to workers.dev subdomain',
+						'Deploy to your own zone'
+					]
+				}
+			])
+			.then((answers) => {
+				resolve(answers.deploy)
+			})
+	})
+}
+
+const inputZoneId = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'input',
+					name: 'zoneId',
+					message: `Zone ID:`,
+					validate: (value) => {
+						return value.length > 0
+					}
+				}
+			])
+			.then((answers) => {
+				resolve(answers.zoneId)
+			})
+	})
+}
+
+const inputRoutes = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'input',
+					name: 'routes',
+					message: 'Enter a route for your Worker (seperate multiple routes with ","):',
+					validate: (value) => {
+						return value.length > 4
+					}
+				}
+			])
+			.then((answers) => {
+				resolve(answers.routes.split(',').map((item) => item.trim()))
+			})
+	})
+}
+
 module.exports = {
 	inputAccountId,
 	confirmNamespaceCreation,
 	confirmPublish,
 	confirmSecretAdding,
-	inputVariables
+	inputVariables,
+	selectDomainType,
+	inputZoneId,
+	inputRoutes
 }
 
 /***/ }),
@@ -44896,7 +45007,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"worker-setup","version":"0.1.0","description":"Populate wrangler.toml config file with local environment variables","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup#readme","author":"Maximilian Schiller <schiller@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
+module.exports = JSON.parse('{"name":"worker-setup","version":"0.1.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup#readme","author":"Maximilian Schiller <schiller@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
 
 /***/ }),
 
@@ -45088,7 +45199,8 @@ program
 	})
 
 program
-	.command('setup')
+	.command('start')
+	.alias('deploy')
 	.description('Inteactive generation of wrangler.toml from template')
 
 	.option('-t, --template <path>', 'path to the wrangler.toml template', 'workerConfig.toml')
@@ -45100,14 +45212,6 @@ program
 		const runner = new Runner(null, options)
 		runner.setup()
 	})
-
-/* program
-	.option('-i, --input <path>', 'path to the input wrangler.toml')
-	.option('-o, --output <path>', 'path to the output wrangler.toml')
-	.option('-d, --debug', 'log the final config to the console')
-	.action((options) => {
-		wranglerEnv.config(options)
-	}) */
 
 program.on('command:*', (operands) => {
 	console.error(`error: unknown command '${ operands[0] }'\n`)

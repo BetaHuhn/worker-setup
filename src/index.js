@@ -24,7 +24,8 @@ program
 	})
 
 program
-	.command('setup')
+	.command('start')
+	.alias('deploy')
 	.description('Inteactive generation of wrangler.toml from template')
 
 	.option('-t, --template <path>', 'path to the wrangler.toml template', 'workerConfig.toml')
@@ -36,14 +37,6 @@ program
 		const runner = new Runner(null, options)
 		runner.setup()
 	})
-
-/* program
-	.option('-i, --input <path>', 'path to the input wrangler.toml')
-	.option('-o, --output <path>', 'path to the output wrangler.toml')
-	.option('-d, --debug', 'log the final config to the console')
-	.action((options) => {
-		wranglerEnv.config(options)
-	}) */
 
 program.on('command:*', (operands) => {
 	console.error(`error: unknown command '${ operands[0] }'\n`)
