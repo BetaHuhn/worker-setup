@@ -44156,7 +44156,7 @@ class Runner {
 		}
 	}
 
-	async setup() {
+	async deploy() {
 		try {
 			this.log.info('This program will guide you through the setup of this CloudFlare Worker')
 			this.log.info('Please follow the steps closely. If you want to cancel at anytime, press CTRL+C')
@@ -45107,7 +45107,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"worker-setup","version":"1.2.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup#readme","author":"Maximilian Schiller <schiller@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
+module.exports = JSON.parse('{"name":"worker-setup","version":"1.2.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup","author":"Maximilian Schiller <hello@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
 
 /***/ }),
 
@@ -45282,46 +45282,40 @@ const Runner = __nccwpck_require__(86949)
 program
 	.version(packageJson.version, '-v, --version')
 	.description(packageJson.description)
+	.addHelpText('before', `👷🛠️   ${ packageJson.name } v${ packageJson.version }\n`)
+	.addHelpText('after', `\nBy ${ packageJson.author }\n${ packageJson.homepage } - ${ packageJson.license } License`)
 
 program
-	.command('start')
-	.alias('deploy')
-	.description('Interactive setup and deployment of Worker based on Worker config file')
-
+	.option('-d, --debug', 'enable debug mode', false)
 	.option('-t, --template <path>', 'path to the Worker config file', 'workerConfig.toml')
 	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
 
-	.option('-d, --debug', 'enable debug mode', false)
-	.action((options) => {
-		const runner = new Runner(null, options)
-		runner.setup()
+program
+	.command('deploy')
+	.alias('start')
+	.description('Interactive setup and deployment of Worker based on Worker config file')
+	.action((options, cmd) => {
+		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })
+		runner.deploy()
 	})
 
 program
 	.command('generate')
 	.description('Generate wrangler.toml from Worker config file using environment variables')
-
-	.option('-t, --template <path>', 'path to the Worker config file', 'workerConfig.toml')
-	.option('-o, --output <path>', 'path to the output wrangler.toml', 'wrangler.toml')
 	.option('-e, --env <path>', 'path to .env file')
-
-	.option('-d, --debug', 'enable debug mode', false)
-	.action((options) => {
-		const runner = new Runner(null, options)
+	.action((options, cmd) => {
+		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })
 		runner.generate()
 	})
 
 program
 	.command('migrate')
-	.description('Will migrate your old wrangler.toml to a new workerConfig.toml')
-
+	.description('Migrate your old wrangler.toml to a new workerConfig.toml')
 	.option('-i, --input <path>', 'path to the old wrangler.toml file', 'wrangler.toml')
 	.option('-o, --output <path>', 'path to the output workerConfig.toml', 'workerConfig.toml')
 	.option('-g, --gitignore <path>', 'path to .gitignore file', '.gitignore')
-
-	.option('-d, --debug', 'enable debug mode', false)
-	.action((options) => {
-		const runner = new Runner(null, options)
+	.action((options, cmd) => {
+		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })
 		runner.migrate()
 	})
 

@@ -78,7 +78,7 @@ class Runner {
 		}
 	}
 
-	async setup() {
+	async deploy() {
 		try {
 			this.log.info('This program will guide you through the setup of this CloudFlare Worker')
 			this.log.info('Please follow the steps closely. If you want to cancel at anytime, press CTRL+C')

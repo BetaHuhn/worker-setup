@@ -17,8 +17,8 @@
   "bugs": {
     "url": "https://github.com/BetaHuhn/worker-setup/issues"
   },
-  "homepage": "https://github.com/BetaHuhn/worker-setup#readme",
-  "author": "Maximilian Schiller <schiller@mxis.ch>",
+  "homepage": "https://github.com/BetaHuhn/worker-setup",
+  "author": "Maximilian Schiller <hello@mxis.ch>",
   "license": "MIT",
   "keywords": [
     "cloudflare-workers",
