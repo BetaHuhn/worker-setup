@@ -1,5 +1,5 @@
 {
-  "name": "wrangler-config",
+  "name": "worker-setup",
   "version": "0.1.0",
   "description": "Populate wrangler.toml config file with local environment variables",
   "bin": "./dist/index.js",
@@ -12,12 +12,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BetaHuhn/wrangler-config.git"
+    "url": "git+https://github.com/BetaHuhn/worker-setup.git"
   },
   "bugs": {
-    "url": "https://github.com/BetaHuhn/wrangler-config/issues"
+    "url": "https://github.com/BetaHuhn/worker-setup/issues"
   },
-  "homepage": "https://github.com/BetaHuhn/wrangler-config#readme",
+  "homepage": "https://github.com/BetaHuhn/worker-setup#readme",
   "author": "Maximilian Schiller <schiller@mxis.ch>",
   "license": "MIT",
   "keywords": [

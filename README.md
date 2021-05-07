@@ -2,7 +2,7 @@
 
 # Wrangler Config
 
-[![Node CI](https://github.com/BetaHuhn/wrangler-config/workflows/Node%20CI/badge.svg)](https://github.com/BetaHuhn/wrangler-config/actions?query=workflow%3A%22Node+CI%22) [![Release CI](https://github.com/BetaHuhn/wrangler-config/workflows/Release%20CI/badge.svg)](https://github.com/BetaHuhn/wrangler-config/actions?query=workflow%3A%22Release+CI%22) [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/BetaHuhn/wrangler-config/blob/master/LICENSE) ![David](https://img.shields.io/david/betahuhn/wrangler-config)
+[![Node CI](https://github.com/BetaHuhn/worker-setup/workflows/Node%20CI/badge.svg)](https://github.com/BetaHuhn/worker-setup/actions?query=workflow%3A%22Node+CI%22) [![Release CI](https://github.com/BetaHuhn/worker-setup/workflows/Release%20CI/badge.svg)](https://github.com/BetaHuhn/worker-setup/actions?query=workflow%3A%22Release+CI%22) [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/BetaHuhn/worker-setup/blob/master/LICENSE) ![David](https://img.shields.io/david/betahuhn/worker-setup)
 
 Interactive setup and deployment of pre-made CloudFlare Workers
 
@@ -10,22 +10,22 @@ Interactive setup and deployment of pre-made CloudFlare Workers
 
 ## 👋 Introduction
 
-While `wrangler generate` is meant to generate a completely new worker from an existing template, `wrangler-config` is meant to setup a pre-made Worker like [cf-worker-redirect](https://github.com/BetaHuhn/cf-worker-redirect).
+While `wrangler generate` is meant to generate a completely new worker from an existing template, `worker-setup` is meant to setup a pre-made Worker like [cf-worker-redirect](https://github.com/BetaHuhn/cf-worker-redirect).
 
-The basic wrangler configuration, required KV Namespaces and Environment variables are stored in `workerConfig.toml` file. When a user wants to setup your Worker, they can simply run `wrangler-config setup` and they will be guided through the process of setting up and deploying the Worker. Required KV Namespaces are automatically created and the user is asked to input all required Environment variables.
+The basic wrangler configuration, required KV Namespaces and Environment variables are stored in `workerConfig.toml` file. When a user wants to setup your Worker, they can simply run `worker-setup setup` and they will be guided through the process of setting up and deploying the Worker. Required KV Namespaces are automatically created and the user is asked to input all required Environment variables.
 
 ## 🚀 Get started
 
-Install [wrangler-config](https://github.com/BetaHuhn/wrangler-config) via npm:
+Install [worker-setup](https://github.com/BetaHuhn/worker-setup) via npm:
 
 ```shell
-npm install wrangler-config
+npm install worker-setup
 ```
 
 Start the setup process:
 
 ```shell
-wrangler-config setup
+worker-setup setup
 ```
 
 > Requires a local workerConfig.toml file
@@ -33,7 +33,7 @@ wrangler-config setup
 ## 📚 Usage
 
 ```
-wrangler-config generate
+worker-setup generate
 ```
 
 Will use a local `workerConfig.toml` and environment variables/.env file to generate a `wrangler.toml`
@@ -41,7 +41,7 @@ Will use a local `workerConfig.toml` and environment variables/.env file to gene
 ---
 
 ```
-wrangler-config setup
+worker-setup setup
 ```
 
 Will start interactive setup process. Required KV Namespaces are automatically created and the user is asked to input all required Environment variables. The final `wrangler.toml` will be generated from the template.
@@ -77,7 +77,7 @@ git clone https://github.com/betahuhn/cf-worker-redirect && cd cf-worker-redirec
 Next start the interactive setup process:
 
 ```shell
-wrangler-config setup
+worker-setup setup
 ```
 
 You will be asked to input a few values specific to your CloudFlare Account and the Worker will be deployed.
@@ -85,7 +85,7 @@ You will be asked to input a few values specific to your CloudFlare Account and 
 You can also manually publish the Worker with:
 
 ```shell
-wrangler-config publish
+worker-setup publish
 ```
 
 ## 💻 Development
