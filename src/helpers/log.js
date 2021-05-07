@@ -1,4 +1,5 @@
 const ora = require('ora')
+const chalk = require('chalk')
 
 const logger = (logEnabled) => {
 	const spinner = ora()
@@ -13,7 +14,7 @@ const logger = (logEnabled) => {
 	}
 
 	const warn = (text) => {
-		spinner.warn(` ${ text }`)
+		spinner.warn(chalk.yellow(` ${ text }`))
 	}
 
 	const succeed = (text) => {
@@ -21,7 +22,7 @@ const logger = (logEnabled) => {
 	}
 
 	const fail = (text) => {
-		spinner.fail(` ${ text }`)
+		spinner.fail(chalk.red(` ${ text }`))
 	}
 
 	const clear = () => {

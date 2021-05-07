@@ -1,4 +1,5 @@
 const { performance } = require('perf_hooks')
+const chalk = require('chalk')
 
 const {
 	forEach,
@@ -81,8 +82,8 @@ class Runner {
 	async deploy() {
 		try {
 			this.log.info('This program will guide you through the deployment of this CloudFlare Worker')
-			this.log.info('Please follow the steps closely. If you want to cancel at anytime, press CTRL+C')
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.info(`Please follow the steps closely. If you want to cancel at anytime, press ${ chalk.cyan('CTRL+C') }`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
 			const workerConfig = await parseToml(this.options.template)
 			this.log.debug(workerConfig)
@@ -95,13 +96,13 @@ class Runner {
 
 				const authMethod = await io.selectAuthMethod()
 
-				this.log.text(`---------------------------------------------------------------------------------`)
+				this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 				if (authMethod === 'browser') {
 
 					await wrangler.browserLogin(this.log)
 
 				} else {
-					this.log.info(`To find your API Token, go to https://dash.cloudflare.com/profile/api-tokens and create it using the "Edit Cloudflare Workers" template.`)
+					this.log.info(`To find your API Token, go to ${ chalk.cyan('https://dash.cloudflare.com/profile/api-tokens') } and create it using the "Edit Cloudflare Workers" template.`)
 
 					const token = await io.inputApiToken()
 
@@ -111,14 +112,14 @@ class Runner {
 			}
 
 			this.log.succeed(`Successfully authenticated with CloudFlare`)
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
 			let accountId = await wrangler.getAccountId()
 			this.log.debug(accountId)
 
 			if (!accountId) {
 				this.log.fail(`Could not get your Account ID automatically.`)
-				this.log.info(`Visit your Workers Dashboard (https://dash.cloudflare.com/?to=/:account/workers) and paste your Account ID below:`)
+				this.log.info(`Visit your Workers Dashboard (${ chalk.cyan('https://dash.cloudflare.com/?to=/:account/workers') }) and paste your Account ID below:`)
 				accountId = await io.inputAccountId()
 			}
 
@@ -129,9 +130,9 @@ class Runner {
 			workerConfig.name = workerName
 
 			if (workerConfig.kv_namespaces) {
-				this.log.text(`---------------------------------------------------------------------------------`)
+				this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
-				this.log.info(`The Worker you are trying to deploy uses Workers KV storage.`)
+				this.log.info(`The Worker you are trying to deploy uses Workers KV storage`)
 				this.log.load(`Checking if required Namespaces exist...`)
 
 				const existingNamespaces = await wrangler.getNamespaces(accountId)
@@ -174,7 +175,7 @@ class Runner {
 
 					const create = await io.confirmNamespaceCreation()
 					if (!create) {
-						this.log.warn(`Please create the following KV Namespaces yourself before continuing: ${ createNamespaces.join(', ') }`)
+						this.log.info(`Please create the following KV Namespaces yourself before continuing: ${ createNamespaces.join(', ') }`)
 						process.exit(0)
 					}
 
@@ -200,7 +201,7 @@ class Runner {
 			}
 
 			if (workerConfig.secrets) {
-				this.log.text(`---------------------------------------------------------------------------------`)
+				this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
 				this.log.info(`The Worker you are trying to deploy requires one or more secrets`)
 				this.log.load(`Checking if required secrets are set`)
@@ -242,7 +243,7 @@ class Runner {
 
 					const askForSecrets = await io.confirmSecretAdding()
 					if (!askForSecrets) {
-						this.log.warn(`Please create the following secrets yourself before continuing: ${ missingSecrets.join(', ') }`)
+						this.log.info(`Please create the following secrets yourself before continuing: ${ missingSecrets.join(', ') }`)
 						process.exit(0)
 					}
 
@@ -268,7 +269,7 @@ class Runner {
 			}
 
 			if (workerConfig.variables) {
-				this.log.text(`---------------------------------------------------------------------------------`)
+				this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
 				this.log.info(`The Worker you are trying to deploy requires one or more environment variables`)
 				this.log.info(`The following variables are needed:`)
@@ -282,7 +283,7 @@ class Runner {
 
 				const askForVariables = await io.confirmVariableAdding()
 				if (!askForVariables) {
-					this.log.warn(`Please add the following variables yourself before continuing: ${ workerConfig.variables.join(', ') }`)
+					this.log.info(`Please add the following variables yourself before continuing: ${ workerConfig.variables.join(', ') }`)
 					process.exit(0)
 				}
 
@@ -293,11 +294,11 @@ class Runner {
 				delete workerConfig.variables
 			}
 
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
 			const domainType = await io.selectDomainType()
 			if (domainType === 'Deploy to your own zone') {
-				this.log.info(`Please go to your CloudFlare Dashboard to retrieve your Zone ID`)
+				this.log.info(`Please go to your CloudFlare Dashboard (${ chalk.cyan('https://dash.cloudflare.com') }) to retrieve your ${ chalk.cyan('Zone ID') }`)
 
 				const zoneId = await io.inputZoneId()
 
@@ -305,7 +306,7 @@ class Runner {
 				workerConfig.zone_id = zoneId
 
 				if (workerConfig.recommended_route) {
-					this.log.info(`The author of the Worker suggests the following route: ${ workerConfig.recommended_route } (replace with your Zone)`)
+					this.log.info(`The author of the Worker suggests the following route: ${ chalk.cyan(workerConfig.recommended_route) } (replace with your Zone)`)
 				}
 
 				const routes = await io.inputRoutes()
@@ -313,22 +314,22 @@ class Runner {
 				this.log.debug(routes)
 				workerConfig.routes = routes
 
-				this.log.succeed(`Using your Zone "${ zoneId }"`)
+				this.log.succeed(`Using your Zone "${ chalk.cyan(zoneId) }"`)
 			} else {
 				workerConfig.workers_dev = true
 			}
 
-			this.log.text(`---------------------------------------------------------------------------------`)
-			this.log.load(`Writing final config to ${ this.options.output }`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
+			this.log.load(`Writing final config to ${ chalk.cyan(this.options.output) }`)
 
 			await writeToml(this.options.output, workerConfig)
 
-			this.log.succeed(`Config written to ${ this.options.output }`)
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.succeed(`Config written to ${ chalk.cyan(this.options.output) }`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
 			const publish = await io.confirmPublish()
 			if (!publish) {
-				this.log.warn(`Run \`wrangler publish\` to deploy your Worker manually.`)
+				this.log.info(`Run ${ chalk.cyan('\`wrangler publish\`') }  to deploy your Worker manually.`)
 				process.exit(0)
 			}
 
@@ -339,22 +340,23 @@ class Runner {
 
 			const t1 = performance.now()
 			const diff = t1 - t0
+			const builtTime = Math.round((diff / 1000) * 100) / 100
 
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
-			this.log.info(`Built took ${ Math.round((diff / 1000) * 100) / 100 } seconds`)
-			if (published.size) this.log.info(`Built project size is ${ published.size }`)
+			this.log.info(`Built took ${ chalk.cyan(builtTime + ' seconds') }`)
+			if (published.size) this.log.info(`Built project size is ${ chalk.cyan(published.size) }`)
 
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 
 			const domain = published.domain ? `https://${ published.domain }` : workerConfig.routes.join(', ')
-			this.log.succeed(`Success! Your Worker was deployed to ${ domain } 🚀`)
+			this.log.succeed(`${ chalk.green('Success!') } Your Worker was deployed to ${ chalk.cyan(domain) } 🚀`)
 
 		} catch (err) {
 
 			if (err.name === 'LOGIN') {
 				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
-				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` to login manually or try again.`)
+				this.log.info(`Run ${ chalk.cyan('\`wrangler login\`') } or ${ chalk.cyan('\`wrangler config\`') } to login manually or try again.`)
 
 				this.log.debug(err.message)
 				return
@@ -362,7 +364,7 @@ class Runner {
 
 			if (err.name === 'SECRETLIST') {
 				this.log.fail(`Could not get your current secrets`)
-				this.log.warn(`Run \`wrangler secret list\` to debug the error.`)
+				this.log.info(`Run ${ chalk.cyan('\`wrangler secret list\`') } to debug the error.`)
 
 				this.log.debug(err.message)
 				return
@@ -370,7 +372,7 @@ class Runner {
 
 			if (err.name === 'NAMESPACELIST') {
 				this.log.fail(`Could not get your existing Namespaces`)
-				this.log.warn(`Run \`wrangler kv:namespace list\` to debug the error.`)
+				this.log.info(`Run ${ chalk.cyan('\`wrangler kv:namespace list\`') } to debug the error.`)
 
 				this.log.debug(err.message)
 				return
@@ -378,13 +380,13 @@ class Runner {
 
 			if (err.name === 'CREATENAMESPACE') {
 				this.log.fail(`Could not create Namespace "${ err.data }"`)
-				this.log.warn(`Run \`wrangler kv:namespace create ${ err.data }\` to create the Namespace manually.`)
+				this.log.info(`Run ${ chalk.cyan(`\`wrangler kv:namespace create ${ err.data }\``) } to create the Namespace manually.`)
 				return
 			}
 
 			if (err.name === 'SAVESECRET') {
 				this.log.fail(`Could not create Secret "${ err.data }"`)
-				this.log.warn(`Run \`wrangler secret put ${ err.data }\` to create the Secret manually.`)
+				this.log.info(`Run ${ chalk.cyan(`\`wrangler secret put ${ err.data }\``) } to create the Secret manually.`)
 
 				this.log.debug(err.message)
 				return
@@ -392,7 +394,7 @@ class Runner {
 
 			if (err.name === 'PUBLISHWORKER') {
 				this.log.fail(`Could not deploy the Worker.`)
-				this.log.warn(`Run \`wrangler publish\` to deploy your Worker manually.`)
+				this.log.info(`Run ${ chalk.cyan('\`wrangler publish\`') } to deploy your Worker manually.`)
 
 				this.log.debug(err.message)
 				return
@@ -405,7 +407,7 @@ class Runner {
 
 	async migrate() {
 		try {
-			this.log.load(`Migrating "${ this.options.input }" to "${ this.options.output }"`)
+			this.log.load(`Migrating ${ chalk.cyan(this.options.input) } to ${ chalk.cyan(this.options.output) }`)
 
 			const wranglerConfig = await parseToml(this.options.input)
 			this.log.debug(wranglerConfig)
@@ -425,12 +427,12 @@ class Runner {
 			delete wranglerConfig.vars
 
 			await addToGitIgnore(this.options.gitignore, this.options.input)
-			this.log.succeed(`${ this.options.input } added to ${ this.options.gitignore }`)
+			this.log.succeed(`${ chalk.cyan(this.options.input) } added to ${ chalk.cyan(this.options.gitignore) }`)
 
 			await writeToml(this.options.output, wranglerConfig)
-			this.log.succeed(`Transfered config from "${ this.options.input }" to "${ this.options.output }"`)
+			this.log.succeed(`Transfered config from ${ chalk.cyan(this.options.input) } to ${ chalk.cyan(this.options.output) }`)
 
-			this.log.succeed(`Migration successful!`)
+			this.log.succeed(`Migration ${ chalk.green('successful') }!`)
 
 		} catch (err) {
 			this.log.fail(err.message)
@@ -452,7 +454,7 @@ class Runner {
 
 			const authMethod = await io.selectAuthMethod()
 
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 			if (authMethod === 'browser') {
 
 				await wrangler.browserLogin(this.log)
@@ -466,13 +468,13 @@ class Runner {
 				await wrangler.tokenLogin(token)
 			}
 
-			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.text(chalk.blue(`---------------------------------------------------------------------------------`))
 			this.log.succeed(`Successfully logged in!`)
 
 		} catch (err) {
 			if (err.name === 'LOGIN') {
 				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
-				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` to login manually or try again.`)
+				this.log.info(`Run ${ chalk.cyan('\`wrangler login\`') } or ${ chalk.cyan('\`wrangler config\`') } to login manually or try again.`)
 
 				this.log.debug(err.message)
 				return
