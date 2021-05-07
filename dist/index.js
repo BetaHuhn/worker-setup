@@ -46056,9 +46056,12 @@ class Runner {
 
 	async generate() {
 		try {
-			const templateConfig = await parseToml(this.options.template)
+			this.log.load(`Parsing existing config ${ chalk.cyan(this.options.template) }...`)
 
+			const templateConfig = await parseToml(this.options.template)
 			this.log.debug(templateConfig)
+
+			this.log.changeText(`Modifying config...`)
 
 			wranglerOptions.forEach((option) => {
 				const val = getValue(option.key, option.type)
@@ -46103,8 +46106,11 @@ class Runner {
 			delete templateConfig.secrets
 
 			this.log.debug(templateConfig)
+			this.log.changeText(`Saving config to ${ chalk.cyan(this.options.output) }...`)
 
 			await writeToml(this.options.output, templateConfig)
+
+			this.log.succeed(`Config ${ chalk.cyan(this.options.output) } successfully generated!`)
 
 		} catch (err) {
 			this.log.fail(err.message)
@@ -46493,7 +46499,7 @@ class Runner {
 				await wrangler.browserLogin(this.log)
 
 			} else {
-				this.log.info(`To find your API Token, go to https://dash.cloudflare.com/profile/api-tokens and create it using the "Edit Cloudflare Workers" template.`)
+				this.log.info(`To find your API Token, go to ${ chalk.cyan('https://dash.cloudflare.com/profile/api-tokens') } and create it using the "Edit Cloudflare Workers" template.`)
 
 				const token = await io.inputApiToken()
 
