@@ -6,6 +6,8 @@
 
 Interactive setup and deployment of pre-made CloudFlare Workers
 
+![demo](https://user-images.githubusercontent.com/51766171/117510368-3e462a00-af8c-11eb-969c-011a6a8be14a.gif)
+
 </div>
 
 ## 👋 Introduction
