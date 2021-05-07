@@ -42,9 +42,9 @@ Will use a local `workerConfig.toml` and environment variables/.env file to gene
 
 ## 🛠️ Setup
 
-[worker-setup](https://github.com/BetaHuhn/worker-setup) uses a `wranglerConfig.toml` file which replaces your normal `wrangler.toml`. It supports everything you normally put into your `wrangler.toml` file as well as more (see below).
+[worker-setup](https://github.com/BetaHuhn/worker-setup) uses a `workerConfig.toml` file which replaces your normal `wrangler.toml`. It supports everything you normally put into your `wrangler.toml` file as well as more (see below).
 
-To start using [worker-setup](https://github.com/BetaHuhn/worker-setup) you have to create the `wranglerConfig.toml` file and add your old `wrangler.toml` to your `.gitignore` file.
+To start using [worker-setup](https://github.com/BetaHuhn/worker-setup) you have to create the `workerConfig.toml` file and add your old `wrangler.toml` to your `.gitignore` file.
 
 Put any options you would normally store in the `wrangler.toml`, like the name, type, webpack_config into it instead.
 
@@ -66,7 +66,7 @@ The same for plain-text environment variables:
 variables = [ "VAR_EXAMPLE" ]
 ```
 
-When you run `worker-setup start`, [worker-setup](https://github.com/BetaHuhn/worker-setup) will use `wranglerConfig.toml` to know what your Worker needs and ask the user to input the required values as well create the required KV Namespaces. Once everything is done, it will output a normal `wrangler.toml` file and deploy the worker with [`wrangler`](https://github.com/cloudflare/wrangler).
+When you run `worker-setup start`, [worker-setup](https://github.com/BetaHuhn/worker-setup) will use `workerConfig.toml` to know what your Worker needs and ask the user to input the required values as well create the required KV Namespaces. Once everything is done, it will output a normal `wrangler.toml` file and deploy the worker with [`wrangler`](https://github.com/cloudflare/wrangler).
 
 ## ⚙️ Configuration
 
