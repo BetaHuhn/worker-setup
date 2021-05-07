@@ -34,6 +34,15 @@ program
 	})
 
 program
+	.command('login')
+	.description('Login with CloudFlare using the browser or a api token')
+	.option('-m, --method <browser/token>', 'specify which auth method to use')
+	.action((options, cmd) => {
+		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })
+		runner.login()
+	})
+
+program
 	.command('migrate')
 	.description('Migrate your old wrangler.toml to a new workerConfig.toml')
 	.option('-i, --input <path>', 'path to the old wrangler.toml file', 'wrangler.toml')

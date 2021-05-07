@@ -80,14 +80,40 @@ class Runner {
 
 	async deploy() {
 		try {
-			this.log.info('This program will guide you through the setup of this CloudFlare Worker')
+			this.log.info('This program will guide you through the deployment of this CloudFlare Worker')
 			this.log.info('Please follow the steps closely. If you want to cancel at anytime, press CTRL+C')
 			this.log.text(`---------------------------------------------------------------------------------`)
 
 			const workerConfig = await parseToml(this.options.template)
 			this.log.debug(workerConfig)
 
-			let accountId = await wrangler.isAuthenticated()
+			this.log.load(`Checking if you're authenticated with CloudFlare...`)
+			const isAuthenticated = await wrangler.isAuthenticated()
+			if (!isAuthenticated) {
+				this.log.warn(`Could not authenticate with CloudFlare, you have to login first`)
+				this.log.info(`You can login using your browser or by specifying an API token`)
+
+				const authMethod = await io.selectAuthMethod()
+
+				this.log.text(`---------------------------------------------------------------------------------`)
+				if (authMethod === 'browser') {
+
+					await wrangler.browserLogin(this.log)
+
+				} else {
+					this.log.info(`To find your API Token, go to https://dash.cloudflare.com/profile/api-tokens and create it using the "Edit Cloudflare Workers" template.`)
+
+					const token = await io.inputApiToken()
+
+					this.log.load(`Logging you in...`)
+					await wrangler.tokenLogin(token)
+				}
+			}
+
+			this.log.succeed(`Successfully authenticated with CloudFlare`)
+			this.log.text(`---------------------------------------------------------------------------------`)
+
+			let accountId = await wrangler.getAccountId()
 			this.log.debug(accountId)
 
 			if (!accountId) {
@@ -103,8 +129,9 @@ class Runner {
 			workerConfig.name = workerName
 
 			if (workerConfig.kv_namespaces) {
-				this.log.info(`The Worker you are trying to deploy uses Workers KV storage.`)
+				this.log.text(`---------------------------------------------------------------------------------`)
 
+				this.log.info(`The Worker you are trying to deploy uses Workers KV storage.`)
 				this.log.load(`Checking if required Namespaces exist...`)
 
 				const existingNamespaces = await wrangler.getNamespaces(accountId)
@@ -172,11 +199,10 @@ class Runner {
 				workerConfig.kv_namespaces = finalNamespaces
 			}
 
-			this.log.text(`---------------------------------------------------------------------------------`)
-
 			if (workerConfig.secrets) {
-				this.log.info(`The Worker you are trying to deploy requires one or more secrets`)
+				this.log.text(`---------------------------------------------------------------------------------`)
 
+				this.log.info(`The Worker you are trying to deploy requires one or more secrets`)
 				this.log.load(`Checking if required secrets are set`)
 
 				const existingSecrets = await wrangler.getSecrets(accountId)
@@ -241,11 +267,10 @@ class Runner {
 				delete workerConfig.secrets
 			}
 
-			this.log.text(`---------------------------------------------------------------------------------`)
-
 			if (workerConfig.variables) {
-				this.log.info(`The Worker you are trying to deploy requires one or more environment variables`)
+				this.log.text(`---------------------------------------------------------------------------------`)
 
+				this.log.info(`The Worker you are trying to deploy requires one or more environment variables`)
 				this.log.info(`The following variables are needed:`)
 				this.log.text('')
 
@@ -327,9 +352,9 @@ class Runner {
 
 		} catch (err) {
 
-			if (err.name === 'NOAUTH') {
-				this.log.fail(`Could not authenticate with CloudFlare, please login with CloudFlare before setting up the Worker.`)
-				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` and then return to the setup.`)
+			if (err.name === 'LOGIN') {
+				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
+				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` to login manually or try again.`)
 
 				this.log.debug(err.message)
 				return
@@ -408,6 +433,51 @@ class Runner {
 			this.log.succeed(`Migration successful!`)
 
 		} catch (err) {
+			this.log.fail(err.message)
+			this.log.debug(err)
+		}
+	}
+
+	async login() {
+		try {
+			this.log.load(`Checking if already logged in...`)
+
+			const alreadyLoggedIn = await wrangler.isAuthenticated()
+			if (alreadyLoggedIn) {
+				this.log.succeed(`Already logged in!`)
+				return
+			}
+
+			this.log.info(`There are multiple ways to login with CloudFlare, using your browser or by specifying an API token`)
+
+			const authMethod = await io.selectAuthMethod()
+
+			this.log.text(`---------------------------------------------------------------------------------`)
+			if (authMethod === 'browser') {
+
+				await wrangler.browserLogin(this.log)
+
+			} else {
+				this.log.info(`To find your API Token, go to https://dash.cloudflare.com/profile/api-tokens and create it using the "Edit Cloudflare Workers" template.`)
+
+				const token = await io.inputApiToken()
+
+				this.log.load(`Logging you in...`)
+				await wrangler.tokenLogin(token)
+			}
+
+			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.succeed(`Successfully logged in!`)
+
+		} catch (err) {
+			if (err.name === 'LOGIN') {
+				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
+				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` to login manually or try again.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
 			this.log.fail(err.message)
 			this.log.debug(err)
 		}

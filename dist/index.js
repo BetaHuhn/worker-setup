@@ -44158,14 +44158,40 @@ class Runner {
 
 	async deploy() {
 		try {
-			this.log.info('This program will guide you through the setup of this CloudFlare Worker')
+			this.log.info('This program will guide you through the deployment of this CloudFlare Worker')
 			this.log.info('Please follow the steps closely. If you want to cancel at anytime, press CTRL+C')
 			this.log.text(`---------------------------------------------------------------------------------`)
 
 			const workerConfig = await parseToml(this.options.template)
 			this.log.debug(workerConfig)
 
-			let accountId = await wrangler.isAuthenticated()
+			this.log.load(`Checking if you're authenticated with CloudFlare...`)
+			const isAuthenticated = await wrangler.isAuthenticated()
+			if (!isAuthenticated) {
+				this.log.warn(`Could not authenticate with CloudFlare, you have to login first`)
+				this.log.info(`You can login using your browser or by specifying an API token`)
+
+				const authMethod = await io.selectAuthMethod()
+
+				this.log.text(`---------------------------------------------------------------------------------`)
+				if (authMethod === 'browser') {
+
+					await wrangler.browserLogin(this.log)
+
+				} else {
+					this.log.info(`To find your API Token, go to https://dash.cloudflare.com/profile/api-tokens and create it using the "Edit Cloudflare Workers" template.`)
+
+					const token = await io.inputApiToken()
+
+					this.log.load(`Logging you in...`)
+					await wrangler.tokenLogin(token)
+				}
+			}
+
+			this.log.succeed(`Successfully authenticated with CloudFlare`)
+			this.log.text(`---------------------------------------------------------------------------------`)
+
+			let accountId = await wrangler.getAccountId()
 			this.log.debug(accountId)
 
 			if (!accountId) {
@@ -44181,8 +44207,9 @@ class Runner {
 			workerConfig.name = workerName
 
 			if (workerConfig.kv_namespaces) {
-				this.log.info(`The Worker you are trying to deploy uses Workers KV storage.`)
+				this.log.text(`---------------------------------------------------------------------------------`)
 
+				this.log.info(`The Worker you are trying to deploy uses Workers KV storage.`)
 				this.log.load(`Checking if required Namespaces exist...`)
 
 				const existingNamespaces = await wrangler.getNamespaces(accountId)
@@ -44250,11 +44277,10 @@ class Runner {
 				workerConfig.kv_namespaces = finalNamespaces
 			}
 
-			this.log.text(`---------------------------------------------------------------------------------`)
-
 			if (workerConfig.secrets) {
-				this.log.info(`The Worker you are trying to deploy requires one or more secrets`)
+				this.log.text(`---------------------------------------------------------------------------------`)
 
+				this.log.info(`The Worker you are trying to deploy requires one or more secrets`)
 				this.log.load(`Checking if required secrets are set`)
 
 				const existingSecrets = await wrangler.getSecrets(accountId)
@@ -44319,11 +44345,10 @@ class Runner {
 				delete workerConfig.secrets
 			}
 
-			this.log.text(`---------------------------------------------------------------------------------`)
-
 			if (workerConfig.variables) {
-				this.log.info(`The Worker you are trying to deploy requires one or more environment variables`)
+				this.log.text(`---------------------------------------------------------------------------------`)
 
+				this.log.info(`The Worker you are trying to deploy requires one or more environment variables`)
 				this.log.info(`The following variables are needed:`)
 				this.log.text('')
 
@@ -44405,9 +44430,9 @@ class Runner {
 
 		} catch (err) {
 
-			if (err.name === 'NOAUTH') {
-				this.log.fail(`Could not authenticate with CloudFlare, please login with CloudFlare before setting up the Worker.`)
-				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` and then return to the setup.`)
+			if (err.name === 'LOGIN') {
+				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
+				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` to login manually or try again.`)
 
 				this.log.debug(err.message)
 				return
@@ -44491,6 +44516,51 @@ class Runner {
 		}
 	}
 
+	async login() {
+		try {
+			this.log.load(`Checking if already logged in...`)
+
+			const alreadyLoggedIn = await wrangler.isAuthenticated()
+			if (alreadyLoggedIn) {
+				this.log.succeed(`Already logged in!`)
+				return
+			}
+
+			this.log.info(`There are multiple ways to login with CloudFlare, using your browser or by specifying an API token`)
+
+			const authMethod = await io.selectAuthMethod()
+
+			this.log.text(`---------------------------------------------------------------------------------`)
+			if (authMethod === 'browser') {
+
+				await wrangler.browserLogin(this.log)
+
+			} else {
+				this.log.info(`To find your API Token, go to https://dash.cloudflare.com/profile/api-tokens and create it using the "Edit Cloudflare Workers" template.`)
+
+				const token = await io.inputApiToken()
+
+				this.log.load(`Logging you in...`)
+				await wrangler.tokenLogin(token)
+			}
+
+			this.log.text(`---------------------------------------------------------------------------------`)
+			this.log.succeed(`Successfully logged in!`)
+
+		} catch (err) {
+			if (err.name === 'LOGIN') {
+				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
+				this.log.warn(`Run \`wrangler login\` or \`wrangler config\` to login manually or try again.`)
+
+				this.log.debug(err.message)
+				return
+			}
+
+			this.log.fail(err.message)
+			this.log.debug(err)
+		}
+	}
+
 }
 
 module.exports = Runner
@@ -44500,11 +44570,25 @@ module.exports = Runner
 /***/ 17163:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const { execCmd } = __nccwpck_require__(95339)
+const { exec } = __nccwpck_require__(63129)
+
+const { execCmd } = __nccwpck_require__(79403)
 
 const wranglerBin = 'node_modules/.bin/wrangler'
 
 const isAuthenticated = async () => {
+	try {
+		const output = await execCmd(`${ wranglerBin } whoami`)
+
+		if (output.toLowerCase().includes('are logged in')) return true
+
+		return false
+	} catch (err) {
+		return false
+	}
+}
+
+const getAccountId = async () => {
 	try {
 		const output = await execCmd(`${ wranglerBin } whoami`)
 
@@ -44513,7 +44597,53 @@ const isAuthenticated = async () => {
 
 		return matches.length === 3 ? matches[2] : undefined
 	} catch (err) {
-		throw { name: 'NOAUTH', message: err.message }
+		return undefined
+	}
+}
+
+const browserLogin = async (log) => {
+	return new Promise((resolve, reject) => {
+		const spawn = exec(`echo y | ${ wranglerBin } login`)
+
+		let result = ''
+
+		spawn.stdout.on('data', (data) => {
+			const output = data.toString()
+
+			const rgx = /(https:\/\/dash.cloudflare.com\/.*)/
+			const matches = rgx.exec(output)
+
+			if (matches && matches[1]) {
+				log.info(`Please open this link in your browser and login with your username and password:`)
+				log.text(matches[1])
+			}
+
+			result += data.toString()
+		})
+
+		spawn.stderr.on('data', (data) => {
+			reject({ name: 'LOGIN', message: data.toString() })
+		})
+
+		spawn.on('exit', (code) => {
+			if (code !== 0 || result.toLowerCase().includes('successfully configured') !== true) {
+				reject({ name: 'LOGIN', message: result })
+			}
+
+			resolve()
+		})
+	})
+}
+
+const tokenLogin = async (token) => {
+	try {
+		const output = await execCmd(`echo "${ token }" | ${ wranglerBin } config`)
+
+		if (output.toLowerCase().includes('successfully configured') === false) throw { name: 'LOGIN', message: output }
+
+		return true
+	} catch (err) {
+		throw { name: 'LOGIN', message: err.message }
 	}
 }
 
@@ -44590,6 +44720,9 @@ const publishWorker = async (accountId) => {
 
 module.exports = {
 	isAuthenticated,
+	getAccountId,
+	browserLogin,
+	tokenLogin,
 	getNamespaces,
 	createNamespace,
 	getSecrets,
@@ -44722,6 +44855,7 @@ module.exports = {
 const { logger } = __nccwpck_require__(54269)
 const { getValue } = __nccwpck_require__(40569)
 const { parseToml, writeToml, addToGitIgnore } = __nccwpck_require__(25649)
+const { execCmd } = __nccwpck_require__(95339)
 
 // From https://github.com/toniov/p-iteration/blob/master/lib/static-methods.js - MIT © Antonio V
 const forEach = async (array, callback) => {
@@ -44737,7 +44871,8 @@ module.exports = {
 	parseToml,
 	writeToml,
 	getValue,
-	addToGitIgnore
+	addToGitIgnore,
+	execCmd
 }
 
 /***/ }),
@@ -44917,7 +45052,10 @@ const inputSecrets = async (secrets) => {
 					type: 'password',
 					name: secret,
 					mask: '*',
-					message: `Enter a value for "${ secret }":`
+					message: `Enter a value for "${ secret }":`,
+					validate: (value) => {
+						return value.length > 0
+					}
 				}
 			}))
 			.then((answers) => {
@@ -44950,7 +45088,10 @@ const inputVariables = async (variables) => {
 				return {
 					type: 'input',
 					name: variable,
-					message: `Enter a value for "${ variable }":`
+					message: `Enter a value for "${ variable }":`,
+					validate: (value) => {
+						return value.length > 0
+					}
 				}
 			}))
 			.then((answers) => {
@@ -45017,6 +45158,48 @@ const inputRoutes = async () => {
 	})
 }
 
+const selectAuthMethod = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'list',
+					name: 'method',
+					message: `How do you want to login?`,
+					choices: [
+						'Using the Browser',
+						'Using an API Token'
+					]
+				}
+			])
+			.then((answers) => {
+				if (answers.method === 'Using the Browser') resolve('browser')
+
+				return resolve('token')
+			})
+	})
+}
+
+const inputApiToken = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'password',
+					name: 'token',
+					message: `Enter API Token:`,
+					mask: '*',
+					validate: (value) => {
+						return value.length > 0
+					}
+				}
+			])
+			.then((answers) => {
+				resolve(answers.token)
+			})
+	})
+}
+
 module.exports = {
 	inputAccountId,
 	inputName,
@@ -45028,7 +45211,9 @@ module.exports = {
 	inputVariables,
 	selectDomainType,
 	inputZoneId,
-	inputRoutes
+	inputRoutes,
+	selectAuthMethod,
+	inputApiToken
 }
 
 /***/ }),
@@ -45109,7 +45294,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"worker-setup","version":"1.2.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup","author":"Maximilian Schiller <hello@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@cloudflare/wrangler":"^1.16.1","@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
+module.exports = JSON.parse('{"name":"worker-setup","version":"1.3.0","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup","author":"Maximilian Schiller <hello@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@cloudflare/wrangler":"^1.16.1","@iarna/toml":"^2.2.5","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.28.5","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
 
 /***/ }),
 
@@ -45308,6 +45493,15 @@ program
 	.action((options, cmd) => {
 		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })
 		runner.generate()
+	})
+
+program
+	.command('login')
+	.description('Login with CloudFlare using the browser or a api token')
+	.option('-m, --method <browser/token>', 'specify which auth method to use')
+	.action((options, cmd) => {
+		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })
+		runner.login()
 	})
 
 program

@@ -1,8 +1,22 @@
-const { execCmd } = require('./helpers/cmd')
+const { exec } = require('child_process')
+
+const { execCmd } = require('./helpers')
 
 const wranglerBin = 'node_modules/.bin/wrangler'
 
 const isAuthenticated = async () => {
+	try {
+		const output = await execCmd(`${ wranglerBin } whoami`)
+
+		if (output.toLowerCase().includes('are logged in')) return true
+
+		return false
+	} catch (err) {
+		return false
+	}
+}
+
+const getAccountId = async () => {
 	try {
 		const output = await execCmd(`${ wranglerBin } whoami`)
 
@@ -11,7 +25,53 @@ const isAuthenticated = async () => {
 
 		return matches.length === 3 ? matches[2] : undefined
 	} catch (err) {
-		throw { name: 'NOAUTH', message: err.message }
+		return undefined
+	}
+}
+
+const browserLogin = async (log) => {
+	return new Promise((resolve, reject) => {
+		const spawn = exec(`echo y | ${ wranglerBin } login`)
+
+		let result = ''
+
+		spawn.stdout.on('data', (data) => {
+			const output = data.toString()
+
+			const rgx = /(https:\/\/dash.cloudflare.com\/.*)/
+			const matches = rgx.exec(output)
+
+			if (matches && matches[1]) {
+				log.info(`Please open this link in your browser and login with your username and password:`)
+				log.text(matches[1])
+			}
+
+			result += data.toString()
+		})
+
+		spawn.stderr.on('data', (data) => {
+			reject({ name: 'LOGIN', message: data.toString() })
+		})
+
+		spawn.on('exit', (code) => {
+			if (code !== 0 || result.toLowerCase().includes('successfully configured') !== true) {
+				reject({ name: 'LOGIN', message: result })
+			}
+
+			resolve()
+		})
+	})
+}
+
+const tokenLogin = async (token) => {
+	try {
+		const output = await execCmd(`echo "${ token }" | ${ wranglerBin } config`)
+
+		if (output.toLowerCase().includes('successfully configured') === false) throw { name: 'LOGIN', message: output }
+
+		return true
+	} catch (err) {
+		throw { name: 'LOGIN', message: err.message }
 	}
 }
 
@@ -88,6 +148,9 @@ const publishWorker = async (accountId) => {
 
 module.exports = {
 	isAuthenticated,
+	getAccountId,
+	browserLogin,
+	tokenLogin,
 	getNamespaces,
 	createNamespace,
 	getSecrets,

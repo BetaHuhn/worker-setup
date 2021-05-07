@@ -89,7 +89,10 @@ const inputSecrets = async (secrets) => {
 					type: 'password',
 					name: secret,
 					mask: '*',
-					message: `Enter a value for "${ secret }":`
+					message: `Enter a value for "${ secret }":`,
+					validate: (value) => {
+						return value.length > 0
+					}
 				}
 			}))
 			.then((answers) => {
@@ -122,7 +125,10 @@ const inputVariables = async (variables) => {
 				return {
 					type: 'input',
 					name: variable,
-					message: `Enter a value for "${ variable }":`
+					message: `Enter a value for "${ variable }":`,
+					validate: (value) => {
+						return value.length > 0
+					}
 				}
 			}))
 			.then((answers) => {
@@ -189,6 +195,48 @@ const inputRoutes = async () => {
 	})
 }
 
+const selectAuthMethod = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'list',
+					name: 'method',
+					message: `How do you want to login?`,
+					choices: [
+						'Using the Browser',
+						'Using an API Token'
+					]
+				}
+			])
+			.then((answers) => {
+				if (answers.method === 'Using the Browser') resolve('browser')
+
+				return resolve('token')
+			})
+	})
+}
+
+const inputApiToken = async () => {
+	return new Promise((resolve) => {
+		inquirer
+			.prompt([
+				{
+					type: 'password',
+					name: 'token',
+					message: `Enter API Token:`,
+					mask: '*',
+					validate: (value) => {
+						return value.length > 0
+					}
+				}
+			])
+			.then((answers) => {
+				resolve(answers.token)
+			})
+	})
+}
+
 module.exports = {
 	inputAccountId,
 	inputName,
@@ -200,5 +248,7 @@ module.exports = {
 	inputVariables,
 	selectDomainType,
 	inputZoneId,
-	inputRoutes
+	inputRoutes,
+	selectAuthMethod,
+	inputApiToken
 }
