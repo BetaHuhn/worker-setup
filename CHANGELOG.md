@@ -1,3 +1,7 @@
+## [v1.4.2] - 2021-05-17
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.2) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.1...v1.4.2) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.2) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.2.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.2.tar.gz))
+
 ## [v1.4.1] - 2021-05-07
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.1) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.0...v1.4.1) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.1) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.1.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.1.tar.gz))
