@@ -1,3 +1,12 @@
+## [v1.4.5] - 2021-06-14
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.5) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.4...v1.4.5) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.5) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.5.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.5.tar.gz))
+
+### Dependency updates
+
+- [`8b3c407`](https://github.com/BetaHuhn/worker-setup/commit/8b3c407)  Bump eslint from 7.27.0 to 7.28.0
+- [`cd0d91a`](https://github.com/BetaHuhn/worker-setup/commit/cd0d91a)  Bump ora from 5.4.0 to 5.4.1
+
 ## [v1.4.4] - 2021-06-07
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.4) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.3...v1.4.4) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.4) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.4.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.4.tar.gz))
