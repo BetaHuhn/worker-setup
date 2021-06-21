@@ -1,3 +1,11 @@
+## [v1.4.6] - 2021-06-21
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.6) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.5...v1.4.6) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.6) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.6.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.6.tar.gz))
+
+### Dependency updates
+
+- [`3aff951`](https://github.com/BetaHuhn/worker-setup/commit/3aff951)  Bump inquirer from 8.1.0 to 8.1.1
+
 ## [v1.4.5] - 2021-06-14
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.5) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.4...v1.4.5) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.5) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.5.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.5.tar.gz))
