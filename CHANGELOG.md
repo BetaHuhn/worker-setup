@@ -1,3 +1,11 @@
+## [v1.4.7] - 2021-06-28
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.7) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.6...v1.4.7) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.7) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.7.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.7.tar.gz))
+
+### Dependency updates
+
+- [`8707054`](https://github.com/BetaHuhn/worker-setup/commit/8707054)  Bump eslint from 7.28.0 to 7.29.0
+
 ## [v1.4.6] - 2021-06-21
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.6) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.5...v1.4.6) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.6) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.6.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.6.tar.gz))
