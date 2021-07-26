@@ -1,3 +1,12 @@
+## [v1.4.10] - 2021-07-26
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.10) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.9...v1.4.10) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.10) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.10.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.10.tar.gz))
+
+### Dependency updates
+
+- [`3488e6b`](https://github.com/BetaHuhn/worker-setup/commit/3488e6b)  Bump @vercel/ncc from 0.28.6 to 0.29.0
+- [`77bf0f8`](https://github.com/BetaHuhn/worker-setup/commit/77bf0f8)  Bump eslint from 7.30.0 to 7.31.0
+
 ## [v1.4.9] - 2021-07-19
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.9) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.8...v1.4.9) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.9) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.9.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.9.tar.gz))
