@@ -1,3 +1,11 @@
+## [v1.4.11] - 2021-08-02
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.11) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.10...v1.4.11) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.11) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.11.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.11.tar.gz))
+
+### Dependency updates
+
+- [`246c424`](https://github.com/BetaHuhn/worker-setup/commit/246c424)  Bump chalk from 4.1.1 to 4.1.2
+
 ## [v1.4.10] - 2021-07-26
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.10) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.9...v1.4.10) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.10) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.10.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.10.tar.gz))
