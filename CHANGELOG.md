@@ -1,3 +1,12 @@
+## [v1.4.12] - 2021-08-09
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.12) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.11...v1.4.12) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.12) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.12.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.12.tar.gz))
+
+### Dependency updates
+
+- [`c3a823d`](https://github.com/BetaHuhn/worker-setup/commit/c3a823d)  Bump eslint from 7.31.0 to 7.32.0
+- [`c67b656`](https://github.com/BetaHuhn/worker-setup/commit/c67b656)  Bump @cloudflare/wrangler from 1.18.0 to 1.19.0
+
 ## [v1.4.11] - 2021-08-02
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.11) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.10...v1.4.11) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.11) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.11.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.11.tar.gz))
