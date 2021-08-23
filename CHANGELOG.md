@@ -1,3 +1,12 @@
+## [v1.4.13] - 2021-08-23
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.13) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.12...v1.4.13) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.13) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.13.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.13.tar.gz))
+
+### Dependency updates
+
+- [`6a83f64`](https://github.com/BetaHuhn/worker-setup/commit/6a83f64)  Bump @vercel/ncc from 0.29.0 to 0.29.1
+- [`13e0027`](https://github.com/BetaHuhn/worker-setup/commit/13e0027)  Bump @vercel/ncc from 0.29.1 to 0.29.2
+
 ## [v1.4.12] - 2021-08-09
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.12) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.11...v1.4.12) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.12) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.12.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.12.tar.gz))
