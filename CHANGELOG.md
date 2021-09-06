@@ -1,3 +1,13 @@
+## [v1.4.14] - 2021-09-06
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.14) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.13...v1.4.14) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.14) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.14.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.14.tar.gz))
+
+### Dependency updates
+
+- [`e942561`](https://github.com/BetaHuhn/worker-setup/commit/e942561)  Bump @vercel/ncc from 0.29.2 to 0.30.0
+- [`f4f8571`](https://github.com/BetaHuhn/worker-setup/commit/f4f8571)  Bump @cloudflare/wrangler from 1.19.0 to 1.19.1
+- [`b6feeb2`](https://github.com/BetaHuhn/worker-setup/commit/b6feeb2)  Bump @cloudflare/wrangler from 1.19.1 to 1.19.2
+
 ## [v1.4.13] - 2021-08-23
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.13) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.12...v1.4.13) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.13) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.13.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.13.tar.gz))
