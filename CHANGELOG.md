@@ -1,3 +1,15 @@
+## [v1.4.16] - 2021-09-20
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.16) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.15...v1.4.16) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.16) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.16.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.16.tar.gz))
+
+### Dependency updates
+
+- [`738aae9`](https://github.com/BetaHuhn/worker-setup/commit/738aae9)  Bump @vercel/ncc from 0.31.0 to 0.31.1
+- [`48eff8c`](https://github.com/BetaHuhn/worker-setup/commit/48eff8c)  Bump inquirer from 8.1.2 to 8.1.3
+- [`c45f337`](https://github.com/BetaHuhn/worker-setup/commit/c45f337)  Bump inquirer from 8.1.3 to 8.1.4
+- [`5f78fe2`](https://github.com/BetaHuhn/worker-setup/commit/5f78fe2)  Bump inquirer from 8.1.4 to 8.1.5
+- [`d62e73c`](https://github.com/BetaHuhn/worker-setup/commit/d62e73c)  Bump @cloudflare/wrangler from 1.19.2 to 1.19.3
+
 ## [v1.4.15] - 2021-09-13
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.15) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.14...v1.4.15) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.15) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.15.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.15.tar.gz))
