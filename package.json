@@ -39,7 +39,7 @@
   "devDependencies": {
     "@betahuhn/config": "^1.1.0",
     "@vercel/ncc": "^0.31.0",
-    "eslint": "^7.25.0"
+    "eslint": "^8.0.0"
   },
   "publishConfig": {
     "access": "public"
