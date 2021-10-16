@@ -1,5 +1,4 @@
 const { exec } = require('child_process')
-
 const { execCmd } = require('./helpers')
 
 const wranglerBin = 'node_modules/.bin/wrangler'

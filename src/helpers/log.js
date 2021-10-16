@@ -57,6 +57,10 @@ const logger = (logEnabled) => {
 		debug(text)
 	}
 
+	const line = () => {
+		text(chalk.blue(`---------------------------------------------------------------------------------`))
+	}
+
 	return {
 		load,
 		changeText,
@@ -67,7 +71,8 @@ const logger = (logEnabled) => {
 		debug,
 		clear,
 		succeed,
-		stop
+		stop,
+		line
 	}
 }
 
