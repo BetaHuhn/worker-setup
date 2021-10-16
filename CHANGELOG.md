@@ -1,3 +1,15 @@
+## [v1.5.0] - 2021-10-16
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.5.0) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.17...v1.5.0) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.5.0) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.5.0.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.5.0.tar.gz))
+
+### New features
+
+- [`e5a8f5b`](https://github.com/BetaHuhn/worker-setup/commit/e5a8f5b)  Print custom instructions and fix spelling
+
+### Updates
+
+- [`e7b5e6c`](https://github.com/BetaHuhn/worker-setup/commit/e7b5e6c)  Change order of pushing secrets and deployment
+
 ## [v1.4.17] - 2021-10-11
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.4.17) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.4.16...v1.4.17) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.4.17) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.4.17.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.4.17.tar.gz))

@@ -1,6 +1,6 @@
 {
   "name": "worker-setup",
-  "version": "1.4.17",
+  "version": "1.5.0",
   "description": "Interactive setup and deployment of pre-made Cloudflare Workers",
   "bin": "./dist/index.js",
   "files": [
