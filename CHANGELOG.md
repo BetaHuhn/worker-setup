@@ -149,7 +149,7 @@
 ### New features
 
 - [`519b2a1`](https://github.com/BetaHuhn/worker-setup/commit/519b2a1)  Install wrangler binary automatically
-- [`ff0ec5d`](https://github.com/BetaHuhn/worker-setup/commit/ff0ec5d)  Login to CloudFlare via browser or api token if Wrangler not already authenticated
+- [`ff0ec5d`](https://github.com/BetaHuhn/worker-setup/commit/ff0ec5d)  Login to Cloudflare via browser or api token if Wrangler not already authenticated
 
 ## [v1.3.0] - 2021-05-07
 

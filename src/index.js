@@ -35,7 +35,7 @@ program
 
 program
 	.command('login')
-	.description('Login with CloudFlare using the browser or a api token')
+	.description('Login with Cloudflare using the browser or a api token')
 	.option('-m, --method <browser/token>', 'specify which auth method to use')
 	.action((options, cmd) => {
 		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })

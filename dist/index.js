@@ -38094,17 +38094,17 @@ class Runner {
 
 	async deploy() {
 		try {
-			this.log.info('This program will guide you through the deployment of this CloudFlare Worker')
+			this.log.info('This program will guide you through the deployment of this Cloudflare Worker')
 			this.log.info(`Please follow the steps closely. If you want to cancel at anytime, press ${ chalk.cyan('CTRL+C') }`)
 			this.log.line()
 
 			const workerConfig = await parseToml(this.options.template)
 			this.log.debug(workerConfig)
 
-			this.log.load(`Checking if you're authenticated with CloudFlare...`)
+			this.log.load(`Checking if you're authenticated with Cloudflare...`)
 			const isAuthenticated = await wrangler.isAuthenticated()
 			if (!isAuthenticated) {
-				this.log.warn(`Could not authenticate with CloudFlare, you have to login first`)
+				this.log.warn(`Could not authenticate with Cloudflare, you have to login first`)
 				this.log.info(`You can login using your browser or by specifying an API token`)
 
 				const authMethod = await io.selectAuthMethod()
@@ -38124,7 +38124,7 @@ class Runner {
 				}
 			}
 
-			this.log.succeed(`Successfully authenticated with CloudFlare`)
+			this.log.succeed(`Successfully authenticated with Cloudflare`)
 			this.log.line()
 
 			let accountId = await wrangler.getAccountId()
@@ -38244,7 +38244,7 @@ class Runner {
 
 			const domainType = await io.selectDomainType()
 			if (domainType === 'Deploy to your own zone') {
-				this.log.info(`Please go to your CloudFlare Dashboard (${ chalk.cyan('https://dash.cloudflare.com') }) to retrieve your ${ chalk.cyan('Zone ID') }`)
+				this.log.info(`Please go to your Cloudflare Dashboard (${ chalk.cyan('https://dash.cloudflare.com') }) to retrieve your ${ chalk.cyan('Zone ID') }`)
 
 				const zoneId = await io.inputZoneId()
 
@@ -38296,7 +38296,7 @@ class Runner {
 			this.log.line()
 
 			const domain = published.domain ? `https://${ published.domain }` : workerConfig.routes.join(', ')
-			this.log.succeed(`${ chalk.green('Success!') } Your Worker was deployed to ${ chalk.cyan(domain) } 🚀`)
+			this.log.succeed(`${ chalk.green('Success!') } Deployed to ${ chalk.cyan(domain) } 🚀`)
 
 			// Note: Secrets can only be changed after the Worker was pushed i.e. created
 			if (workerConfig.secrets) {
@@ -38365,18 +38365,23 @@ class Runner {
 				}
 
 				delete workerConfig.secrets
+			}
 
+			this.log.line()
+
+			if (workerConfig.instructions) {
+				this.log.info('Further instructions:')
+				this.log.text(workerConfig.instructions)
 				this.log.line()
 			}
 
 			this.log.succeed('All done! Your Worker is ready to be used ✨')
-			// Print instructions
 			this.log.text(chalk.cyan(domain))
 
 		} catch (err) {
 
 			if (err.name === 'LOGIN') {
-				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
+				this.log.fail(`Could not login with Cloudflare. Maybe your token was wrong?`)
 				this.log.info(`Run ${ chalk.cyan('\`wrangler login\`') } or ${ chalk.cyan('\`wrangler config\`') } to login manually or try again.`)
 
 				this.log.debug(err.message)
@@ -38471,7 +38476,7 @@ class Runner {
 				return
 			}
 
-			this.log.info(`There are multiple ways to login with CloudFlare, using your browser or by specifying an API token`)
+			this.log.info(`There are multiple ways to login with Cloudflare, using your browser or by specifying an API token`)
 
 			const authMethod = await io.selectAuthMethod()
 
@@ -38494,7 +38499,7 @@ class Runner {
 
 		} catch (err) {
 			if (err.name === 'LOGIN') {
-				this.log.fail(`Could not login with CloudFlare. Maybe your token was wrong?`)
+				this.log.fail(`Could not login with Cloudflare. Maybe your token was wrong?`)
 				this.log.info(`Run ${ chalk.cyan('\`wrangler login\`') } or ${ chalk.cyan('\`wrangler config\`') } to login manually or try again.`)
 
 				this.log.debug(err.message)
@@ -39244,7 +39249,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"worker-setup","version":"1.4.17","description":"Interactive setup and deployment of pre-made CloudFlare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup","author":"Maximilian Schiller <hello@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@cloudflare/wrangler":"^1.16.1","@iarna/toml":"^2.2.5","chalk":"^4.1.1","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.31.0","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
+module.exports = JSON.parse('{"name":"worker-setup","version":"1.4.17","description":"Interactive setup and deployment of pre-made Cloudflare Workers","bin":"./dist/index.js","files":["dist"],"scripts":{"lint":"eslint ./src/","build":"ncc build src/index.js -o dist"},"repository":{"type":"git","url":"git+https://github.com/BetaHuhn/worker-setup.git"},"bugs":{"url":"https://github.com/BetaHuhn/worker-setup/issues"},"homepage":"https://github.com/BetaHuhn/worker-setup","author":"Maximilian Schiller <hello@mxis.ch>","license":"MIT","keywords":["cloudflare-workers","cloudflare-wrangler","wrangler","workers","environment-variables"],"dependencies":{"@cloudflare/wrangler":"^1.16.1","@iarna/toml":"^2.2.5","chalk":"^4.1.1","commander":"^7.1.0","dotenv":"^8.5.1","inquirer":"^8.0.0","ora":"^5.4.0"},"devDependencies":{"@betahuhn/config":"^1.1.0","@vercel/ncc":"^0.31.0","eslint":"^7.25.0"},"publishConfig":{"access":"public"}}');
 
 /***/ }),
 
@@ -39449,7 +39454,7 @@ program
 
 program
 	.command('login')
-	.description('Login with CloudFlare using the browser or a api token')
+	.description('Login with Cloudflare using the browser or a api token')
 	.option('-m, --method <browser/token>', 'specify which auth method to use')
 	.action((options, cmd) => {
 		const runner = new Runner(null, { ...cmd.parent.opts(), ...options })

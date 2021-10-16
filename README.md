@@ -6,7 +6,7 @@
 
 [![Node CI](https://github.com/BetaHuhn/worker-setup/workflows/Node%20CI/badge.svg)](https://github.com/BetaHuhn/worker-setup/actions?query=workflow%3A%22Node+CI%22) [![Release CI](https://github.com/BetaHuhn/worker-setup/workflows/Release%20CI/badge.svg)](https://github.com/BetaHuhn/worker-setup/actions?query=workflow%3A%22Release+CI%22) [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/BetaHuhn/worker-setup/blob/master/LICENSE) ![David](https://img.shields.io/david/betahuhn/worker-setup)
 
-Interactive setup and deployment of pre-made CloudFlare Workers
+Interactive setup and deployment of pre-made Cloudflare Workers
 
 ![demo](https://user-images.githubusercontent.com/51766171/117510368-3e462a00-af8c-11eb-969c-011a6a8be14a.gif)
 
@@ -21,7 +21,7 @@ The basic wrangler configuration, required KV Namespaces, secrets and environmen
 ## ⭐ Features
 
 - Generates ready-to-use wrangler.toml file filled with user specific values like Account/Zone/KV Namespace ID
-- Installs and configures [Wrangler](https://github.com/cloudflare/wrangler) (Including authenticating with CloudFlare)
+- Installs and configures [Wrangler](https://github.com/cloudflare/wrangler) (Including authenticating with Cloudflare)
 - Automatically creates required KV Namespaces
 - Prompts the user for required Secrets and Environment Variables (and uploads them)
 - Lets the user choose between deploying to [workers.dev](https://workers.dev) or a custom Zone
@@ -49,7 +49,7 @@ Here's an overview of the available commands:
 worker-setup deploy
 ```
 
-Will start the interactive deployment process. You will be asked to login with CloudFlare if not already logged in. Required KV Namespaces are automatically created and you are asked to input all required secrets and environment variables. The final `wrangler.toml` will be generated from the template.
+Will start the interactive deployment process. You will be asked to login with Cloudflare if not already logged in. Required KV Namespaces are automatically created and you are asked to input all required secrets and environment variables. The final `wrangler.toml` will be generated from the template.
 
 ### Generate
 
@@ -65,7 +65,7 @@ Will use a local `workerConfig.toml` and environment variables/.env file to gene
 worker-setup login
 ```
 
-Will authenticate Wrangler with CloudFlare, either via the browser or by specifying an API token.
+Will authenticate Wrangler with Cloudflare, either via the browser or by specifying an API token.
 
 ### Migrate
 
@@ -116,6 +116,7 @@ As well as these additional options:
 | `secrets` | Specify the required secrets (user will be asked to input during setup) | **No** | `[ "EXAMPLE_SECRET" ]` |
 | `variables` | Specify the required plain-text variables (user will be asked to input during setup) | **No** | `[ "EXAMPLE_VARIABLE" ]` |
 | `recommended_route` | A recommended route to be used with the Worker (will be shown to user) | **No** | `"*example.com/test"` |
+| `instructions` | Specify additional instructions to be printed after deploying the worker | **No** | `Learn how to use the Worker at example.com` |
 
 
 ## 📖 Examples
@@ -140,7 +141,7 @@ Next start the interactive deployment process:
 worker-setup deploy
 ```
 
-You will be asked to login to CloudFlare if not already authenticated. The programm will guide you through the process of setting up and deploying the Worker under your own CloudFlare Account.
+You will be asked to login to Cloudflare if not already authenticated. The programm will guide you through the process of setting up and deploying the Worker under your own Cloudflare Account.
 
 ---
 
@@ -157,6 +158,8 @@ This project was developed by me ([@betahuhn](https://github.com/BetaHuhn)) in m
 [![Donate via PayPal](https://img.shields.io/badge/paypal-donate-009cde.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=394RTSBEEEFEE)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F81S2RK)
+
+**[worker-setup](https://github.com/BetaHuhn/worker-setup) is in no way affiliated with Cloudflare.**
 
 ## 📄 License
 
