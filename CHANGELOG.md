@@ -1,3 +1,11 @@
+## [v1.5.2] - 2021-11-15
+
+[Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.5.2) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.5.1...v1.5.2) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.5.2) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.5.2.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.5.2.tar.gz))
+
+### Dependency updates
+
+- [`0113d85`](https://github.com/BetaHuhn/worker-setup/commit/0113d85)  Bump @cloudflare/wrangler from 1.19.4 to 1.19.5
+
 ## [v1.5.1] - 2021-10-25
 
 [Release notes](https://github.com/BetaHuhn/worker-setup/releases/tag/v1.5.1) · [Compare](https://github.com/BetaHuhn/worker-setup/compare/v1.5.0...v1.5.1) · [Tag](https://github.com/BetaHuhn/worker-setup/tree/v1.5.1) · Archive ([zip](https://github.com/BetaHuhn/worker-setup/archive/v1.5.1.zip) · [tar.gz](https://github.com/BetaHuhn/worker-setup/archive/v1.5.1.tar.gz))
